@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>À propos – Merrytti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .page-content { max-width: 800px; margin: 60px auto; padding: 0 20px; }
+        h1 { font-size: 32px; margin-bottom: 20px; }
+        p  { font-size: 17px; line-height: 1.7; color: #444; margin-bottom: 18px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-inner">
+            <a href="index.html" class="logo-wrap">
+                <img src="assets/logo.png" alt="Merrytti Logo" height="40">
+                <span class="brand-color">Merrytti</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="boutique.html">Boutique</a></li>
+                <li><a href="a-propos.html" class="active">À propos</a></li>
+            </ul>
+            <div class="nav-right" id="navAuth">
+                <a href="connexion.html" class="btn btn-outline btn-sm">Connexion</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content">
+        <h1>Notre Histoire</h1>
+        <p>Merrytti est née d’une idée simple : rendre le geste d’offrir un cadeau aussi exceptionnel que la personne qui le reçoit. En Haïti, nous avons constaté un manque d’options de cadeaux haut de gamme, personnalisées et faciles à offrir. Nous avons donc créé une plateforme qui combine le luxe, la technologie et l’émotion.</p>
+        <p>Notre équipe passionnée sélectionne des expériences uniques — dîners gastronomiques, escapades tropicales, soins bien-être, montres de luxe — et les transforme en cartes cadeaux élégantes, prêtes à être offertes en quelques clics.</p>
+        <p>Merrytti, c’est plus qu’une carte cadeau : c’est la promesse d’un moment inoubliable.</p>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">&copy; 2026 Merrytti. Tous droits réservés.</div>
+        </div>
+    </footer>
+
+    <script>
+        async function mettreAJourNavbar() {
+            try {
+                const rep = await fetch('api/session.php');
+                const data = await rep.json();
+                const navAuth = document.getElementById('navAuth');
+                if (data.connecte) {
+                    navAuth.innerHTML = `<a href="profil.html" class="btn btn-outline btn-sm">${data.nom_utilisateur}</a>`;
+                } else {
+                    navAuth.innerHTML = `<a href="connexion.html" class="btn btn-outline btn-sm">Connexion</a>`;
+                }
+            } catch(e) {}
+        }
+        mettreAJourNavbar();
+    </script>
+</body>
+</html>

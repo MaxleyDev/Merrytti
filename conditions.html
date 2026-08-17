@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conditions Générales – Merrytti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .page-content { max-width: 800px; margin: 60px auto; padding: 0 20px; }
+        h1 { font-size: 32px; margin-bottom: 20px; }
+        h2 { font-size: 22px; margin-top: 30px; }
+        p  { font-size: 16px; line-height: 1.7; color: #444; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-inner">
+            <a href="index.html" class="logo-wrap">
+                <img src="assets/logo.png" alt="Merrytti Logo" height="40">
+                <span class="brand-color">Merrytti</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="boutique.html">Boutique</a></li>
+                <li><a href="conditions.html" class="active">CGU</a></li>
+            </ul>
+            <div class="nav-right" id="navAuth">
+                <a href="connexion.html" class="btn btn-outline btn-sm">Connexion</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content">
+        <h1>Conditions Générales d'Utilisation</h1>
+        <p>Bienvenue sur Merrytti. En utilisant notre plateforme, vous acceptez les conditions suivantes.</p>
+        <h2>1. Services</h2>
+        <p>Merrytti propose des cartes cadeaux pour des expériences sélectionnées. Chaque achat est régi par les descriptions de service fournies.</p>
+        <h2>2. Réservation et Paiement</h2>
+        <p>Les réservations sont confirmées après paiement. Les prix sont en HTG. Toute commande est définitive sauf mention contraire.</p>
+        <h2>3. Utilisation des cartes</h2>
+        <p>Chaque carte est à usage unique. Elle doit être présentée (physiquement ou via QR code) chez le partenaire pour validation.</p>
+        <h2>4. Remboursements</h2>
+        <p>Les remboursements sont possibles sous 7 jours après achat si la carte n'a pas été utilisée. Contactez notre service client.</p>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">&copy; 2026 Merrytti. Tous droits réservés.</div>
+        </div>
+    </footer>
+
+    <script>
+        async function mettreAJourNavbar() {
+            try {
+                const rep = await fetch('api/session.php');
+                const data = await rep.json();
+                const navAuth = document.getElementById('navAuth');
+                if (data.connecte) {
+                    navAuth.innerHTML = `<a href="profil.html" class="btn btn-outline btn-sm">${data.nom_utilisateur}</a>`;
+                } else {
+                    navAuth.innerHTML = `<a href="connexion.html" class="btn btn-outline btn-sm">Connexion</a>`;
+                }
+            } catch(e) {}
+        }
+        mettreAJourNavbar();
+    </script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merrytti – Le cadeau que vous méritez</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════
+       BARRE DE NAVIGATION
+  ═══════════════════════════════════════════════════ -->
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="logo-wrap">
+        <img src="assets/logo.png" alt="Merrytti Logo" height="40" />
+        <span class="brand-color">Merrytti</span>
+      </a>
+
+      <ul class="nav-links">
+    <li><a href="boutique.html">Boutique</a></li>
+    <a href="a-propos.html">À propos</a>
+</ul>
+
+      <div class="nav-right" id="navAuth">
+        
+        <!-- sera rempli par JavaScript -->
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Menu mobile (caché par défaut) -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#products">Boutique</a>
+    <div id="mobileAuth">
+      <a href="connexion.html">Connexion</a>
+      <a href="inscription.html" class="btn btn-red" style="border-radius:8px; margin-top:12px; width:100%">Inscription</a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+     SECTION HERO (ACCUEIL) – PREMIUM LUXE
+═══════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <span class="hero-highlight">La plateforme de cartes cadeaux de luxe en Haïti</span>
+        <h1 class="hero-title">
+          <span class="hero-welcome">Bienvenue chez</span>
+          <em class="brand">Merrytti</em>
+        </h1>
+        <p class="hero-subtitle">
+          Le cadeau que vous méritez
+        </p>
+        <p class="hero-description">
+          Merrytti est une plateforme de cartes cadeaux haut de gamme conçue pour les particuliers et les entreprises. Nous offrons une expérience de cadeau intelligente, utile, précieuse et entièrement personnalisée, avec un système B2B dédié.
+        </p>
+        <a href="reservation.html" class="btn-reservation">
+          ✨ Acheter une carte cadeau
+        </a>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-circle">
+          <img src="assets/hero-img.png" alt="Carte cadeau Merrytti" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- ═══════════════════════════════════════════════════
+       SECTION BOUTIQUE (APERÇU DES 6 CARTES)
+  ═══════════════════════════════════════════════════ -->
+  <section class="products" id="products">
+    <div class="container">
+      <div class="products-head">
+        <h2>Cartes Cadeaux Populaires</h2>
+      </div>
+      <div class="products-grid">
+        <div class="product-card">
+          <div class="product-img"><img src="assets/p1-removebg-preview.png" alt=""></div>
+          <div class="product-body">
+            <div class="product-tag">Luxe</div>
+            <div class="product-name">Carte Diamant</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img"><img src="assets/p2-removebg-preview.png" alt=""></div>
+          <div class="product-body">
+            <div class="product-tag">Voyage</div>
+            <div class="product-name">Escapade Tropicale</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img"><img src="assets/p3-removebg-preview.png" alt=""></div>
+          <div class="product-body">
+            <div class="product-tag">Gastronomie</div>
+            <div class="product-name">Dîner Étoilé</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img"><img src="assets/p4-removebg-preview.png" alt=""></div>
+          <div class="product-body">
+            <div class="product-tag">Bien-être</div>
+            <div class="product-name">Spa & Détente</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img"><img src="assets/p5-removebg-preview.png" alt=""></div>
+          <div class="product-body">
+            <div class="product-tag">Mode</div>
+            <div class="product-name">Montre de Luxe</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img"><img src="assets/p1-removebg-preview.png" alt=""></div>
+          <div class="product-body">
+            <div class="product-tag">Personnalisé</div>
+            <div class="product-name">Coffret Sur Mesure</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       SECTION TÉMOIGNAGES
+  ═══════════════════════════════════════════════════ -->
+ <section class="testimonials">
+  <div class="container">
+    <div class="testi-head">
+      <h2>Ce que disent nos clients</h2>
+      <p>Plus de 5 000 clients satisfaits font confiance à Merrytti</p>
+    </div>
+    <div class="testi-grid" id="testiGrid"></div>
+  </div>
+</section>
+
+  <!-- ═══════════════════════════════════════════════════
+       PIED DE PAGE
+  ═══════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>Merrytti</h4>
+          <p class="footer-desc">
+            La plateforme de cartes cadeaux de luxe en Haïti. Offrez un moment unique.
+          </p>
+        </div>
+                <div>
+          <h4>Liens utiles</h4>
+          <a href="boutique.html">Boutique</a>
+          <a href="a-propos.html">À propos</a>
+          <a href="contact.html">Contact / FAQ</a>
+          <a href="conditions.html">Conditions Générales</a>
+          <a href="confidentialite.html">Confidentialité</a>
+          <a href="carte-cadeau.html">Vérifier une carte</a>
+          <a href="partenaire/login.html">Portail Partenaire</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Merrytti. Tous droits réservés.
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+  <div id="toast"></div>
+
+  <!-- ═══════════════════════════════════════════════════
+       JAVASCRIPT
+  ═══════════════════════════════════════════════════ -->
+  <script>
+    // Bouton retour en haut
+    window.addEventListener('scroll', function() {
+      document.getElementById('backTop').classList.toggle('show', window.scrollY > 400);
+    });
+
+    // Menu hamburger
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', function() {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    });
+    mobileMenu.querySelectorAll('a').forEach(function(lien) {
+      lien.addEventListener('click', function() {
+        hamburger.classList.remove('open');
+        mobileMenu.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // Toast
+    const elementToast = document.getElementById('toast');
+    let minuteurToast;
+    function afficherToast(message) {
+      clearTimeout(minuteurToast);
+      elementToast.textContent = message;
+      elementToast.style.opacity = '1';
+      elementToast.style.transform = 'translateX(-50%) translateY(0)';
+      minuteurToast = setTimeout(function() {
+        elementToast.style.opacity = '0';
+        elementToast.style.transform = 'translateX(-50%) translateY(16px)';
+      }, 2800);
+    }
+
+    document.querySelectorAll('.product-card').forEach(function(carte) {
+      carte.addEventListener('click', function() {
+        var nom = carte.querySelector('.product-name').textContent;
+        afficherToast('Vous avez sélectionné : ' + nom);
+      });
+    });
+
+    // Chargement des témoignages publiés
+    async function chargerTemoignages() {
+      try {
+        const rep = await fetch('api/avis_publics.php?emplacement=temoignages');
+        const avis = await rep.json();
+        const grid = document.getElementById('testiGrid');
+        grid.innerHTML = avis.map(a => `
+          <div class="testi-card">
+            <div class="testi-stars">${'★'.repeat(a.note)}${'☆'.repeat(5 - a.note)}</div>
+            <p class="testi-text">« ${a.commentaire} »</p>
+            <div class="testi-author">${a.auteur}</div>
+          </div>
+        `).join('');
+      } catch(e) {}
+    }
+    chargerTemoignages();
+
+    // === MISE À JOUR DE LA NAVBAR EN FONCTION DE LA SESSION ===
+    async function mettreAJourNavbar() {
+      try {
+        const rep = await fetch('api/session.php');
+        const data = await rep.json();
+        const navAuth = document.getElementById('navAuth');
+        const mobileAuth = document.getElementById('mobileAuth');
+        if (data.connecte) {
+          navAuth.innerHTML = `<a href="profil.html" class="btn btn-outline btn-sm">${data.nom_utilisateur}</a>`;
+          mobileAuth.innerHTML = `<a href="profil.html">Mon Profil</a>`;
+        } else {
+          navAuth.innerHTML = `
+            <a href="connexion.html" class="btn btn-outline btn-sm">Connexion</a>
+            <a href="inscription.html" class="btn btn-red btn-sm">Inscription</a>
+          `;
+          mobileAuth.innerHTML = `
+            <a href="connexion.html">Connexion</a>
+            <a href="inscription.html" class="btn btn-red" style="border-radius:8px; margin-top:12px; width:100%">Inscription</a>
+          `;
+        }
+      } catch(e) {
+        // garder les boutons par défaut
+      }
+    }
+    mettreAJourNavbar();
+
+        function mettreAJourCompteurPanier() {
+        const panier = JSON.parse(localStorage.getItem('panier') || '[]');
+        const span = document.getElementById('cartCount');
+        if (span) span.textContent = panier.length;
+    }
+    mettreAJourCompteurPanier();
+  </script>
+</body>
+</html>

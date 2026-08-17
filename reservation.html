@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KADO – Réservation de Cadeau</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/reservation.css">
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="logo-wrap">
+      <img src="assets/logo.png" alt="Merrytti Logo" height="40" />
+      <span class="brand-color">Merrytti</span>
+    </a>
+   <button class="user-btn" id="userMenuBtn" onclick="allerProfil()">
+    <span class="u-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
+    <span id="userMenuText">Bonjour, Invité</span>
+    <span class="chevron"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+  </button>
+  </div>
+</nav>
+
+<main class="main">
+  <h1 class="page-title">Réserver un Cadeau</h1>
+  <p class="page-subtitle">Remplissez le formulaire pour créer votre réservation de cadeau</p>
+
+  <div class="success-msg" id="successMsg"><span>✅</span><span>Votre réservation a été créée avec succès !</span></div>
+  <div class="error-msg" id="errorMsg"><span>⚠️</span><span id="errorText">Veuillez remplir tous les champs.</span></div>
+
+  <form id="reservForm" onsubmit="gererReservation(event)" novalidate>
+    <!-- Sélection du service -->
+    <div class="field">
+      <label for="serviceChoisi">Service</label>
+      <div class="select-wrap" id="wrapService">
+        <select id="serviceChoisi" name="serviceChoisi">
+          <option value="">-- Choisissez un service --</option>
+        </select>
+        <span class="sel-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="nbCadeaux">Nombre de cadeaux souhaités</label>
+      <div class="select-wrap" id="wrapNbCadeaux">
+        <select id="nbCadeaux" name="nbCadeaux">
+          <option value="">-- Choisissez une option --</option>
+          <option value="1">1 cadeau</option>
+          <option value="2" selected>2 cadeaux</option>
+          <option value="3">3 cadeaux</option>
+          <option value="4">4 cadeaux</option>
+          <option value="5">5 cadeaux</option>
+          <option value="6">6 cadeaux ou plus</option>
+        </select>
+        <span class="sel-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+    </div>
+
+        <div class="field">
+  <label for="emailDestinataire">Email du destinataire (optionnel)</label>
+  <div class="datetime-wrap" style="display:flex; align-items:center;"> 
+    <input type="email" id="emailDestinataire" placeholder="exemple@email.com" style="border:none; outline:none; flex:1; padding:12px;">
+  </div>
+</div>
+
+    <div class="field">
+      <label for="dateReservation">Date de Réservation</label>
+      <div class="datetime-wrap" id="wrapDate">
+        <input type="datetime-local" id="dateReservation" name="dateReservation" value="2025-05-20T19:00" />
+        <span class="dt-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></span>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit">Créer la Réservation</button>
+  </form>
+
+  <div class="support-card">
+    <div class="support-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.86 19.86 0 0 1 3.09 4.18 2 2 0 0 1 5.07 2h3a2 2 0 0 1 2 1.72c.13 1 .37 1.97.72 2.9a2 2 0 0 1-.45 2.11L9.09 9.91a16 16 0 0 0 6 6l1.18-1.18a2 2 0 0 1 2.11-.45c.93.35 1.9.59 2.9.72A2 2 0 0 1 22 16.92z"/></svg></div>
+    <div class="support-text"><strong>Service Client</strong><span>+509 1234 5678</span></div>
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <a href="index.html" class="nav-tab">Accueil</a>
+    <button class="nav-tab active">Réservations</button>
+    <button class="nav-tab">Mes Cadeaux</button>
+    <a href="index.html#contact" class="nav-tab">Contact</a>
+  </div>
+</nav>
+
+<script>
+  // Récupération du token CSRF et des services
+  let csrfJeton = '';
+  async function initialiser() {
+    try {
+      const rep = await fetch('api/csrf_jeton.php');
+      const d = await rep.json();
+      csrfJeton = d.jeton;
+    } catch(e) { console.error(e); }
+
+    // Charger les services
+    try {
+      const rep = await fetch('api/services.php');
+      const services = await rep.json();
+      const select = document.getElementById('serviceChoisi');
+      services.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `${s.nom} - ${s.prix} HTG`;
+        select.appendChild(opt);
+      });
+    } catch(e) { console.error(e); }
+        // Pré-sélectionner un service si le paramètre service_id est dans l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const serviceIdParam = urlParams.get('service_id');
+    if (serviceIdParam) {
+      document.getElementById('serviceChoisi').value = serviceIdParam;
+    }
+  }
+  initialiser();
+
+  async function gererReservation(e) {
+    e.preventDefault();
+    const serviceId = document.getElementById('serviceChoisi').value;
+    const nbCadeaux = document.getElementById('nbCadeaux').value; // pas utilisé côté serveur mais conservé pour UX
+    const dateRes = document.getElementById('dateReservation').value;
+    const errMsg = document.getElementById('errorMsg');
+    const errTxt = document.getElementById('errorText');
+    const sucMsg = document.getElementById('successMsg');
+    const wrapService = document.getElementById('wrapService');
+    const wrapNb = document.getElementById('wrapNbCadeaux');
+    const wrapDate = document.getElementById('wrapDate');
+
+    errMsg.classList.remove('show');
+    sucMsg.classList.remove('show');
+    wrapService.style.borderColor = '';
+    wrapNb.style.borderColor = '';
+    wrapDate.style.borderColor = '';
+
+    let valide = true;
+    if (!serviceId) {
+      wrapService.style.borderColor = 'var(--red)';
+      valide = false;
+    }
+    if (!nbCadeaux) {
+      wrapNb.style.borderColor = 'var(--red)';
+      valide = false;
+    }
+    if (!dateRes) {
+      wrapDate.style.borderColor = 'var(--red)';
+      valide = false;
+    }
+    if (!valide) {
+      errTxt.textContent = 'Veuillez remplir tous les champs.';
+      errMsg.classList.add('show');
+      return;
+    }
+
+        const emailDest = document.getElementById('emailDestinataire').value.trim();
+    const body = { service_id: serviceId, date_reservation: dateRes, email_destinataire: emailDest, csrf_jeton: csrfJeton };
+    try {
+      const rep = await fetch('api/reserver.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await rep.json();
+      if (!rep.ok) throw new Error(data.erreur || 'Erreur serveur');
+            const reservationId = data.reservation_id;   // reçu de l'API
+      if (reservationId) {
+        window.location.href = `paiement.html?reservation_id=${reservationId}`;
+      } else {
+        // fallback : afficher simplement le succès
+        sucMsg.classList.add('show');
+        sucMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        document.getElementById('reservForm').reset();
+        document.getElementById('serviceChoisi').selectedIndex = 0;
+      }
+    } catch (erreur) {
+      errTxt.textContent = erreur.message;
+      errMsg.classList.add('show');
+    }
+  }
+
+  async function mettreAJourBouton() {
+    try {
+      const rep = await fetch('api/session.php');
+      const data = await rep.json();
+      const txt = document.getElementById('userMenuText');
+      if (data.connecte) {
+        txt.textContent = 'Bonjour, ' + data.nom_utilisateur;
+      } else {
+        txt.textContent = 'Bonjour, Invité';
+      }
+    } catch(e) { }
+  }
+  function allerProfil() {
+    window.location.href = 'profil.html';
+  }
+  mettreAJourBouton();
+</script>
+</body>
+</html>

@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merrytti – Portail Interne</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+ <style>
+    body { display: none; }
+    body.ready { display: block; }
+
+    /* ═══════════════════════════════════════════
+       CORRECTIONS POUR LA SECTION CARTES CADEAUX
+    ═══════════════════════════════════════════ */
+    /* Élargir les boutons d'action pour qu'ils puissent contenir du texte */
+    #sec-cartes .act-btn {
+      width: auto;                /* laisse le bouton s’adapter au texte */
+      min-width: 36px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      border-radius: 7px;
+      line-height: 1.4;
+      gap: 6px;                  /* espace entre l’icône et le texte */
+    }
+
+    /* Ajouter un écart suffisant entre les boutons */
+    #sec-cartes .actions-cell {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* Espacement vertical un peu plus grand dans le tableau des cartes */
+    #sec-cartes table td {
+      padding-top: 14px;
+      padding-bottom: 14px;
+    }
+
+    /* Améliorer l’apparence du formulaire “Générer une carte” */
+    #sec-cartes .field {
+      margin-top: 16px;
+    }
+    #sec-cartes .field label {
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: block;
+    }
+    #sec-cartes .btn-new {
+      margin-top: 16px;
+    }
+
+        .btn-sub {
+      background: #eee;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-sub.active {
+      background: var(--red);
+      color: #fff;
+    }
+</style>
+
+  
+</head>
+<body>
+
+<div class="sidebar-overlay" id="overlay" onclick="fermerBarreLaterale()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-box">🎁</div>
+    Merrytti
+  </div>
+
+  <nav class="sidebar-nav" id="navMenu">
+    <!-- sera rempli par JavaScript -->
+  </nav>
+
+  <div class="sidebar-bottom">
+    <button class="nav-item nav-logout" onclick="gererDeconnexion()">
+      <svg viewBox="0 0 24 24">…</svg> Déconnexion
+    </button>
+  </div>
+</aside>
+
+<div class="main-wrap">
+
+  <header class="topbar">
+    <button class="topbar-hamburger" onclick="basculerBarreLaterale()">
+      <span></span><span></span><span></span>
+    </button>
+    <span id="topbarTitle">Tableau de Bord</span>
+    <div class="topbar-right">
+      <button class="period-btn" id="periodBtn" style="display:none;">Ce Mois</button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- Section Tableau de Bord -->
+    <div class="section active" id="sec-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon red">…</div><div><div class="stat-label">Réservations</div><div class="stat-value" id="reservations">0</div></div></div>
+        <div class="stat-card" id="statRevenus" style="display:none;"><div class="stat-icon blue">…</div><div><div class="stat-label">Revenus Totaux (HTG)</div><div class="stat-value" id="revenus">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">…</div><div><div class="stat-label">Acheteurs Totaux</div><div class="stat-value" id="acheteurs">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon amber">…</div><div><div class="stat-label">Cadeaux Listés</div><div class="stat-value" id="cadeaux">0</div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Réservations Récentes</h2><button class="view-all" onclick="naviguer(document.querySelector('[data-section=reservations]'))">Voir tout →</button></div>
+        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Service</th><th>Date</th><th>Statut</th></tr></thead><tbody id="dashTableBody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- Section Réservations -->
+    <div class="section" id="sec-reservations">
+      <div class="section-header">
+        <div><h1>Réservations</h1><p>Gérer toutes les réservations</p></div>
+        <button class="btn-new" onclick="ouvrirModale()">+ Nouvelle</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Service</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="fullTableBody"></tbody></table></div>
+        <div class="table-footer" id="tableFooter"></div>
+      </div>
+    </div>
+
+    
+        <!-- Section Cartes Cadeaux -->
+    <div class="section" id="sec-cartes">
+      <div class="section-header">
+        <div><h1>Cartes Cadeaux</h1><p>Générer et suivre les cartes</p></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Cartes générées</h2></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Code</th><th>Client</th><th>Service</th><th>Expiration</th><th>Statut</th><th>QR</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="cartesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card" style="margin-top:20px;">
+        <div class="card-head"><h2>Générer une carte</h2></div>
+        <p>Choisissez une réservation confirmée pour créer la carte cadeau.</p>
+        <div class="field">
+          <label>Réservation</label>
+          <select id="reservationPourCarte" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></select>
+        </div>
+        <button class="btn-new" onclick="genererCarte()">Générer la carte</button>
+      </div>
+    </div>
+
+        <!-- Section Employés -->
+    <div class="section" id="sec-employes">
+      <div class="section-header">
+        <div><h1>Gestion des Employés</h1><p>Entreprises, employés et dates importantes</p></div>
+      </div>
+
+      <!-- Sous-menus -->
+      <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+        <button class="btn-sub" id="btnEntreprises" onclick="afficherSousSection('entreprises')">🏢 Entreprises</button>
+        <button class="btn-sub" id="btnEmployes" onclick="afficherSousSection('employes')">👤 Employés</button>
+        <button class="btn-sub" id="btnEvenements" onclick="afficherSousSection('evenements')">📅 Événements</button>
+      </div>
+
+      <!-- Bloc Entreprises -->
+      <div class="sub-section" id="sub-entreprises">
+        <div class="card">
+          <div class="card-head"><h2>Liste des entreprises</h2><button class="btn-new" onclick="ouvrirModaleEntreprise()">+ Ajouter</button></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Nom</th><th>Adresse</th><th>Téléphone</th><th>Email</th><th>Actions</th></tr></thead>
+              <tbody id="entreprisesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bloc Employés -->
+      <div class="sub-section" id="sub-employes" style="display:none;">
+        <div class="card">
+          <div class="card-head"><h2>Employés</h2>
+            <select id="selectEntreprisePourEmployes" onchange="chargerEmployes()" style="padding:8px;border-radius:8px;border:1px solid #ddd; margin-right:12px;"></select>
+            <button class="btn-new" onclick="ouvrirModaleEmploye()">+ Ajouter</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Nom</th><th>Prénom</th><th>Naissance</th><th>Embauche</th><th>Actions</th></tr></thead>
+              <tbody id="employesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bloc Événements -->
+      <div class="sub-section" id="sub-evenements" style="display:none;">
+        <div class="card">
+          <div class="card-head"><h2>Événements à venir</h2>
+            <select id="selectEmployePourEvenements" onchange="chargerEvenements()" style="padding:8px;border-radius:8px;border:1px solid #ddd; margin-right:12px;">
+              <option value="">-- Tous --</option>
+            </select>
+            <button class="btn-new" onclick="ouvrirModaleEvenement()">+ Ajouter</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Employé</th><th>Type</th><th>Date</th><th>Description</th></tr></thead>
+              <tbody id="evenementsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Section Avis -->
+    <div class="section" id="sec-avis">
+      <div class="section-header"><div><h1>Avis Clients</h1><p>Gérer les avis</p></div></div>
+      <div class="card">
+        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Auteur</th><th>Service</th><th>Note</th><th>Commentaire</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="avisTableBody"></tbody></table></div>
+      </div>
+      <div class="card" id="editAvisCard" style="display:none; margin-top:20px;">
+        <h3>Modifier l'avis</h3>
+        <input type="hidden" id="editAvisId">
+        <div class="field">
+          <label>Note</label>
+          <div class="note-stars" id="editStarsContainer">
+            <span class="star" data-value="1">★</span><span class="star" data-value="2">★</span><span class="star" data-value="3">★</span><span class="star" data-value="4">★</span><span class="star" data-value="5">★</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Commentaire</label>
+          <textarea id="editCommentaire" rows="3" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;"></textarea>
+        </div>
+        <button class="btn-new" onclick="sauvegarderModification()">Enregistrer</button>
+        <button class="btn-new" style="background:#888;" onclick="annulerModification()">Annuler</button>
+      </div>
+    </div>
+
+        <!-- Section Rapports -->
+    <div class="section" id="sec-rapports">
+      <div class="section-header">
+        <div><h1>Rapports</h1><p>Générer des rapports et exporter les données</p></div>
+      </div>
+
+      <!-- Filtres -->
+      <div class="card" style="margin-bottom:25px;">
+        <div class="card-head"><h2>Filtres</h2></div>
+        <div style="padding:20px; display:flex; flex-wrap:wrap; gap:15px; align-items:end;">
+          <div class="field" style="flex:1; min-width:180px;">
+            <label>Date début</label>
+            <input type="date" id="rapportDateDebut" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+          </div>
+          <div class="field" style="flex:1; min-width:180px;">
+            <label>Date fin</label>
+            <input type="date" id="rapportDateFin" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+          </div>
+          <div class="field" style="flex:1; min-width:200px;">
+            <label>Type de rapport</label>
+            <select id="rapportType" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+              <option value="reservations">Réservations</option>
+              <option value="validations" disabled>Validations partenaires (bientôt)</option>
+            </select>
+          </div>
+          <button class="btn-new" onclick="chargerRapport()" style="height:44px;">🔍 Afficher</button>
+          <button class="btn-new" id="btnExportCSV" style="background:#2e7d32; height:44px;" onclick="exporterCSV()">📥 Exporter CSV</button>
+        </div>
+      </div>
+
+      <!-- Résultat -->
+      <div class="card">
+        <div class="card-head"><h2>Résultats</h2><span id="rapportTotal" style="font-weight:600;"></span></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr id="rapportHeader">
+                <th>ID</th><th>Client</th><th>Service</th><th>Date</th><th>Statut</th><th>Payé</th>
+              </tr>
+            </thead>
+            <tbody id="rapportBody"></tbody>
+          </table>
+        </div>
+        <div class="table-footer" id="rapportFooter"></div>
+      </div>
+    </div>
+
+        <!-- Section Paramètres -->
+    <div class="section" id="sec-parametres">
+      <div class="section-header">
+        <div><h1>Paramètres</h1><p>Modifier votre mot de passe</p></div>
+      </div>
+      <div class="card">
+        <h2>Changer le mot de passe</h2>
+        <form id="formChangerMotDePasse" onsubmit="changerMotDePasse(event)" style="max-width:400px; margin-top:20px;">
+          <div class="field">
+            <label>Ancien mot de passe</label>
+            <input type="password" id="ancienMdp" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+          </div>
+          <div class="field">
+            <label>Nouveau mot de passe</label>
+            <input type="password" id="nouveauMdp" required minlength="6" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+          </div>
+          <button type="submit" class="btn-new">Mettre à jour</button>
+        </form>
+        <div id="msgChangementMdp" style="margin-top:15px; display:none;"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modale Nouvelle Réservation -->
+<div class="modal-bg" id="modalBg" onclick="gererClicFondModale(event)">
+  <div class="modal">
+    <h3>Nouvelle Réservation</h3>
+    <div class="modal-field"><label>Client (nom)</label><input class="modal-input" id="mName" type="text" placeholder="Jean Dupont" /></div>
+    <div class="modal-field"><label>Service</label><select class="modal-select" id="mService"></select></div>
+    <div class="modal-field"><label>Date &amp; Heure</label><input class="modal-input" id="mDate" type="datetime-local" /></div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="fermerModale()">Annuler</button>
+      <button class="modal-btn primary" onclick="enregistrerReservation()">Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modale Générique pour Entreprises / Employés / Événements -->
+<div class="modal-bg" id="modalGenericBg" onclick="fermerModaleGenerique(event)">
+  <div class="modal">
+    <h3 id="modalGenericTitle">Titre</h3>
+    <div id="modalGenericFields"></div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="fermerModaleGenerique()">Annuler</button>
+      <button class="modal-btn primary" id="modalGenericSubmit">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  let roleUtilisateur = null;
+  let csrfJeton = '';
+
+  const API_STATS_OPERATEUR = '../api/stats_operateur.php';
+  const API_RESERVATIONS = '../api/reservations.php';
+  const API_RESERVATION  = '../api/reservation.php';
+  const API_SERVICES     = '../api/services.php';
+  const API_AVIS_ADMIN   = '../api/avis_admin.php';
+  const API_AVIS_PUBLIER = '../api/avis_publier.php';
+  const API_LOGOUT       = '../api/logout.php';
+  const API_CSRF_JETON   = '../api/csrf_jeton.php';
+
+  let reservationsToutes = [];
+  let servicesListe = [];
+  let noteEditSelectionnee = 0;
+
+  const classeStatut = { 'en_attente':'badge-pending','confirmee':'badge-confirmed','annulee':'badge-cancelled','terminee':'badge-confirmed' };
+  const libelleStatut = { 'en_attente':'En attente','confirmee':'Confirmé','annulee':'Annulé','terminee':'Terminé' };
+
+  async function chargerCsrf() {
+    try {
+      const rep = await fetch(API_CSRF_JETON);
+      const data = await rep.json();
+      csrfJeton = data.jeton;
+    } catch(e) {}
+  }
+
+  function ajouterCsrf(body) { return { ...body, csrf_jeton: csrfJeton }; }
+
+  async function chargerStats() {
+    try {
+      // Utiliser le bon endpoint selon le rôle
+      const endpoint = (roleUtilisateur === 'admin') ? '../api/stats.php' : API_STATS_OPERATEUR;
+      const rep = await fetch(endpoint);
+      if (!rep.ok) throw new Error('Erreur');
+      const stats = await rep.json();
+      animerCompteur('reservations', stats.reservations);
+      animerCompteur('acheteurs', stats.acheteurs);
+      animerCompteur('cadeaux', stats.cadeaux);
+      
+      // La carte revenus n'est visible que pour admin
+      if (roleUtilisateur === 'admin') {
+        document.getElementById('statRevenus').style.display = '';
+        animerCompteur('revenus', stats.revenus);
+      } else {
+        document.getElementById('statRevenus').style.display = 'none';
+      }
+    } catch(e) { afficherToast('Erreur stats'); }
+  }
+
+  function animerCompteur(id, cible) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let actuel = 0;
+    const pas = Math.max(1, Math.ceil(cible / 30));
+    const timer = setInterval(() => { actuel = Math.min(actuel+pas, cible); el.textContent = actuel; if(actuel >= cible) clearInterval(timer); }, 30);
+  }
+
+  async function chargerReservations() {
+    try {
+      const rep = await fetch(API_RESERVATIONS);
+      reservationsToutes = await rep.json();
+      afficherDashboard();
+      afficherTableauComplet();
+    } catch(e) { afficherToast('Erreur chargement réservations'); }
+  }
+
+  function afficherDashboard() {
+    const tbody = document.getElementById('dashTableBody');
+    tbody.innerHTML = reservationsToutes.slice(0,5).map(r => `
+      <tr><td class="td-id">${r.id}</td><td>${r.client||''}</td><td>${r.service||''}</td><td>${r.date_formatee}</td><td><span class="badge ${classeStatut[r.statut]}">${libelleStatut[r.statut]}</span></td></tr>
+    `).join('');
+  }
+
+  function afficherTableauComplet() {
+    const tbody = document.getElementById('fullTableBody');
+    tbody.innerHTML = reservationsToutes.map(r => `
+      <tr>
+        <td class="td-id">${r.id}</td>
+        <td>${r.client||''}</td>
+        <td>${r.service||''}</td>
+        <td>${r.date_formatee}</td>
+        <td><span class="badge ${classeStatut[r.statut]}">${libelleStatut[r.statut]}</span></td>
+        <td>
+          <div class="actions-cell">
+            <button class="act-btn act-confirm" onclick="changerStatutRes('${r.id}','confirmee')">✔</button>
+            <button class="act-btn act-cancel" onclick="changerStatutRes('${r.id}','annulee')">✖</button>
+            <button class="act-btn act-view" onclick="changerStatutRes('${r.id}','terminee')">✓</button>
+            <button class="act-btn act-view" onclick="voirDetail('${r.id}')">👁</button>
+            <button class="act-btn act-delete" onclick="supprimerReservation('${r.id}')">🗑</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+    document.getElementById('tableFooter').textContent = `Total : ${reservationsToutes.length} Réservation${reservationsToutes.length>1?'s':''}`;
+  }
+
+  function voirDetail(id) {
+    const r = reservationsToutes.find(x => x.id === id);
+    if(r) alert(`Détails : ${r.id}\nClient: ${r.client}\nService: ${r.service}\nDate: ${r.date_formatee}\nStatut: ${libelleStatut[r.statut]}`);
+  }
+
+  async function changerStatutRes(id, nouveauStatut) {
+    const idNum = id.replace('#','');
+    try {
+      const body = ajouterCsrf({ statut: nouveauStatut });
+      const rep = await fetch(`${API_RESERVATION}?id=${idNum}`, {
+        method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      if(!rep.ok) throw new Error();
+      const r = reservationsToutes.find(x => x.id === id);
+      if(r) r.statut = nouveauStatut;
+      afficherDashboard();
+      afficherTableauComplet();
+      chargerStats();  // rafraîchir les stats après changement
+      afficherToast('Statut mis à jour');
+    } catch(e) { afficherToast('Erreur'); }
+  }
+
+  async function supprimerReservation(id) {
+    if(!confirm('Supprimer cette réservation ?')) return;
+    try {
+      await fetch(`${API_RESERVATION}?id=${id.replace('#','')}`, { method:'DELETE' });
+      reservationsToutes = reservationsToutes.filter(r => r.id !== id);
+      afficherDashboard();
+      afficherTableauComplet();
+      chargerStats();
+      afficherToast('Supprimée');
+    } catch(e) {}
+  }
+
+  function ouvrirModale() {
+    const d = new Date(Date.now() + 3600000);
+    const pad = n => String(n).padStart(2,'0');
+    document.getElementById('mDate').value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    document.getElementById('mName').value='';
+    document.getElementById('modalBg').classList.add('show');
+  }
+  function fermerModale() { document.getElementById('modalBg').classList.remove('show'); }
+  function gererClicFondModale(e) { if(e.target === e.currentTarget) fermerModale(); }
+
+  async function enregistrerReservation() {
+    const nom = document.getElementById('mName').value.trim();
+    const service_id = document.getElementById('mService').value;
+    const dateInput = document.getElementById('mDate').value;
+    if(!nom || !service_id || !dateInput) return afficherToast('Remplissez tous les champs.');
+    const body = ajouterCsrf({ nom, service_id, date_reservation: dateInput.replace('T',' ')+':00' });
+    try {
+      const rep = await fetch(API_RESERVATIONS, {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      if(!rep.ok) throw new Error();
+      fermerModale();
+      afficherToast('Réservation créée !');
+      await chargerReservations();
+      chargerStats();
+    } catch(e) { afficherToast('Erreur création'); }
+  }
+
+  // ---- Avis ----
+  document.getElementById('editStarsContainer').addEventListener('click', function(e) {
+    const star = e.target.closest('.star');
+    if(!star) return;
+    noteEditSelectionnee = parseInt(star.dataset.value);
+    this.querySelectorAll('.star').forEach((s,i) => s.classList.toggle('selected', i<noteEditSelectionnee));
+  });
+
+  async function chargerAvis() {
+    try {
+      const rep = await fetch(API_AVIS_ADMIN);
+      const avis = await rep.json();
+      const tbody = document.getElementById('avisTableBody');
+      tbody.innerHTML = avis.map(a => `
+        <tr>
+          <td>#${a.id}</td><td>${a.auteur}</td><td>${a.service}</td>
+          <td>${'★'.repeat(a.note)}${'☆'.repeat(5-a.note)}</td>
+          <td>${a.commentaire}</td>
+          <td><span class="badge ${a.statut==='approuve'?'badge-confirmed':a.statut==='rejete'?'badge-cancelled':'badge-pending'}">${a.statut}</span></td>
+          <td>
+            <div class="actions-cell">
+              ${a.statut!=='approuve'?`<button class="act-btn act-confirm" onclick="changerStatutAvis(${a.id},'approuve')">✔</button>`:''}
+              ${a.statut!=='rejete'?`<button class="act-btn act-cancel" onclick="changerStatutAvis(${a.id},'rejete')">✖</button>`:''}
+              <button class="act-btn act-view" onclick="ouvrirEditionAvis(${a.id},${a.note},'${a.commentaire.replace(/'/g,"\\'")}')">✎</button>
+              <button class="act-btn act-delete" onclick="supprimerAvis(${a.id})">🗑</button>
+              ${a.statut==='approuve'?`<button class="act-btn act-view" onclick="publierAvisDirect(${a.id})">📢</button>`:''}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    } catch(e) {}
+  }
+
+  async function changerStatutAvis(id, statut) {
+    try {
+      const body = ajouterCsrf({ statut });
+      await fetch(`${API_AVIS_ADMIN}?id=${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      chargerAvis();
+      afficherToast('Statut mis à jour');
+    } catch(e) {}
+  }
+
+  function ouvrirEditionAvis(id, note, commentaire) {
+    document.getElementById('editAvisId').value = id;
+    document.getElementById('editCommentaire').value = commentaire;
+    noteEditSelectionnee = note;
+    document.querySelectorAll('#editStarsContainer .star').forEach((s,i) => s.classList.toggle('selected', i<note));
+    document.getElementById('editAvisCard').style.display = 'block';
+    document.getElementById('editAvisCard').scrollIntoView({behavior:'smooth'});
+  }
+  function annulerModification() { document.getElementById('editAvisCard').style.display = 'none'; }
+  async function sauvegarderModification() {
+    const id = document.getElementById('editAvisId').value;
+    const commentaire = document.getElementById('editCommentaire').value.trim();
+    if(!id || noteEditSelectionnee===0) return;
+    const body = ajouterCsrf({ note:noteEditSelectionnee, commentaire });
+    try {
+      await fetch(`${API_AVIS_ADMIN}?id=${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      document.getElementById('editAvisCard').style.display = 'none';
+      chargerAvis();
+      afficherToast('Avis modifié');
+    } catch(e) {}
+  }
+  async function supprimerAvis(id) {
+    if(!confirm('Supprimer cet avis ?')) return;
+    await fetch(`${API_AVIS_ADMIN}?id=${id}`, { method:'DELETE' });
+    chargerAvis();
+  }
+  async function publierAvisDirect(avisId) {
+    if(!confirm('Publier dans les témoignages ?')) return;
+    try {
+      const body = ajouterCsrf({ avis_id: avisId, emplacement:'temoignages' });
+      await fetch(API_AVIS_PUBLIER, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      afficherToast('Publié !');
+    } catch(e) {}
+  }
+
+  // ---- Menu et navigation ----
+  const sectionsDisponibles = {
+    dashboard:   { roles: ['admin','secretaire'], titre: 'Tableau de Bord' },
+    reservations:{ roles: ['admin','secretaire'], titre: 'Réservations' },
+        avis:        { roles: ['admin'], titre: 'Avis Clients' },
+    cartes:      { roles: ['admin','secretaire'], titre: 'Cartes Cadeaux' },
+    employes:    { roles: ['admin','secretaire'], titre: 'Gestion Employés' },
+    rapports:    { roles: ['admin'], titre: 'Rapports' },
+       parametres:  { roles: ['admin','secretaire'], titre: 'Paramètres' }
+  };
+
+  function construireMenu() {
+    const nav = document.getElementById('navMenu');
+    nav.innerHTML = Object.entries(sectionsDisponibles)
+      .filter(([section, config]) => config.roles.includes(roleUtilisateur))
+      .map(([section, config]) => `<button class="nav-item" data-section="${section}" onclick="naviguer(this)">${config.titre}</button>`)
+      .join('');
+    const premier = nav.querySelector('button');
+    if (premier) {
+      premier.classList.add('active');
+      afficherSection(premier.dataset.section);
+    }
+  }
+
+    function afficherSection(section) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    const secEl = document.getElementById('sec-' + section);
+    if (secEl) secEl.classList.add('active');
+    document.getElementById('topbarTitle').textContent = sectionsDisponibles[section]?.titre || section;
+    document.getElementById('periodBtn').style.display = (section === 'dashboard') ? '' : 'none';
+    if (section === 'avis') chargerAvis();
+    if (section === 'cartes') {
+      chargerCartes();
+      chargerReservationsConfirmees();
+    }
+        if (section === 'employes') {
+      afficherSousSection('entreprises'); // ouvrir par défaut le sous-menu entreprises
+    }
+
+        if (section === 'rapports') {
+      // Pré-remplir la période avec le mois en cours
+      const aujourdhui = new Date();
+      const debutMois = new Date(aujourdhui.getFullYear(), aujourdhui.getMonth(), 1);
+      const finMois = new Date(aujourdhui.getFullYear(), aujourdhui.getMonth() + 1, 0);
+      const formatDate = d => d.toISOString().split('T')[0];
+      document.getElementById('rapportDateDebut').value = formatDate(debutMois);
+      document.getElementById('rapportDateFin').value = formatDate(finMois);
+      chargerRapport(); // charger automatiquement avec les dates par défaut
+    }
+    if (section === 'reservations' || section === 'dashboard') { /* déjà chargé */ }
+  }
+
+  function naviguer(btn) {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    afficherSection(btn.dataset.section);
+    if (window.innerWidth < 768) fermerBarreLaterale();
+  }
+
+  function basculerBarreLaterale() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+  }
+  function fermerBarreLaterale() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+  }
+
+  async function gererDeconnexion() {
+    if(confirm('Se déconnecter ?')) {
+      await fetch(API_LOGOUT);
+      window.location.href = '../connexion.html';  // redirection vers la page de connexion publique
+    }
+  }
+
+  // Toast
+  const toastEl = document.getElementById('toast');
+  let toastTimer;
+  function afficherToast(msg) {
+    clearTimeout(toastTimer);
+    toastEl.textContent = msg;
+    toastEl.style.opacity = '1';
+    toastEl.style.transform = 'translateX(-50%) translateY(0)';
+    toastTimer = setTimeout(() => {
+      toastEl.style.opacity = '0';
+      toastEl.style.transform = 'translateX(-50%) translateY(16px)';
+    }, 2800);
+  }
+
+      async function chargerCartes() {
+    try {
+      const rep = await fetch('../api/cartes_liste.php');
+      const cartes = await rep.json();
+      const tbody = document.getElementById('cartesTableBody');
+      tbody.innerHTML = cartes.map(c => `
+        <tr>
+          <td>${c.code_unique}</td>
+          <td>${c.client}</td>
+          <td>${c.service}</td>
+          <td>${c.date_expiration}</td>
+          <td><span class="badge badge-pending">${c.statut}</span></td>
+          <td><div id="qr-admin-${c.id}" style="width:50px;height:50px;"></div></td>
+          <td>
+            <div class="actions-cell">
+              ${c.statut === 'generee' ? `<button class="act-btn act-confirm" onclick="changerStatutCarte(${c.id},'envoyee')">📤 Envoyer</button>` : ''}
+              ${c.statut === 'envoyee' ? `<button class="act-btn act-view" onclick="changerStatutCarte(${c.id},'utilisee')">✅ Utilisée</button>` : ''}
+              <button class="act-btn act-delete" onclick="supprimerCarte(${c.id})">🗑</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      // Generate QR codes after rendering
+      cartes.forEach(c => {
+        const container = document.getElementById(`qr-admin-${c.id}`);
+        if (container) {
+          new QRCode(container, {
+            text: `${window.location.origin}/carte-cadeau.html?code=${encodeURIComponent(c.code_unique)}`,
+            width: 50,
+            height: 50
+          });
+        }
+      });
+    } catch(e) {}
+  }
+
+  async function chargerReservationsConfirmees() {
+    try {
+      const rep = await fetch('../api/reservations_confirmees.php'); // nouvelle API
+      const resas = await rep.json();
+      const select = document.getElementById('reservationPourCarte');
+      select.innerHTML = resas.map(r => `<option value="${r.id}">#${r.id} - ${r.client} (${r.service})</option>`).join('');
+    } catch(e) {}
+  }
+
+  async function genererCarte() {
+    const reservation_id = document.getElementById('reservationPourCarte').value;
+    if (!reservation_id) return afficherToast('Choisissez une réservation.');
+    const body = ajouterCsrf({ reservation_id });
+    try {
+      const rep = await fetch('../api/generer_carte.php', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      const data = await rep.json();
+      if (!rep.ok) throw new Error(data.erreur);
+      afficherToast('Carte générée !');
+      chargerCartes();
+      chargerReservationsConfirmees(); // rafraîchir la liste
+    } catch(e) { afficherToast(e.message); }
+  }
+
+  async function changerStatutCarte(id, statut) {
+    const body = ajouterCsrf({ id, statut });
+    try {
+      const rep = await fetch('../api/changer_statut_carte.php', {
+        method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      if (!rep.ok) throw new Error();
+      chargerCartes();
+      afficherToast('Statut mis à jour');
+    } catch(e) { afficherToast('Erreur'); }
+  }
+
+    async function supprimerCarte(id) {
+    if (!confirm('Supprimer cette carte ?')) return;
+    try {
+      const rep = await fetch(`../api/supprimer_carte.php?id=${id}`, { method:'DELETE' });
+      if (!rep.ok) throw new Error();
+      chargerCartes();
+      afficherToast('Carte supprimée');
+    } catch(e) { afficherToast('Erreur suppression'); }
+  }
+
+    // ---- Gestion des sous-sections ----
+  function afficherSousSection(sousSection) {
+    document.getElementById('sub-entreprises').style.display = (sousSection === 'entreprises') ? 'block' : 'none';
+    document.getElementById('sub-employes').style.display = (sousSection === 'employes') ? 'block' : 'none';
+    document.getElementById('sub-evenements').style.display = (sousSection === 'evenements') ? 'block' : 'none';
+
+    if (sousSection === 'entreprises') chargerEntreprises();
+    if (sousSection === 'employes') {
+      chargerSelectEntreprises();
+      chargerEmployes();
+    }
+    if (sousSection === 'evenements') {
+      chargerSelectEmployes();
+      chargerEvenements();
+    }
+  }
+
+  // ---- Entreprises ----
+  async function chargerEntreprises() {
+    try {
+      const rep = await fetch('../api/entreprises_liste.php');
+      const entreprises = await rep.json();
+      const tbody = document.getElementById('entreprisesTableBody');
+      tbody.innerHTML = entreprises.map(e => `
+        <tr>
+          <td>${e.nom_entreprise}</td>
+          <td>${e.adresse || ''}</td>
+          <td>${e.telephone || ''}</td>
+          <td>${e.email || ''}</td>
+          <td><button class="act-btn act-delete" onclick="supprimerEntreprise(${e.id})">🗑</button></td>
+        </tr>
+      `).join('');
+    } catch(e) {}
+  }
+
+  async function supprimerEntreprise(id) {
+    if (!confirm('Supprimer cette entreprise et tous ses employés ?')) return;
+    // API simple de suppression à créer rapidement : api/supprimer_entreprise.php
+    try {
+      await fetch(`../api/supprimer_entreprise.php?id=${id}`, { method:'DELETE' });
+      chargerEntreprises();
+      afficherToast('Entreprise supprimée');
+    } catch(e) { afficherToast('Erreur'); }
+  }
+
+  async function ajouterEntreprise(nom, adresse, telephone, email) {
+    const body = ajouterCsrf({ nom_entreprise: nom, adresse, telephone, email });
+    try {
+      const rep = await fetch('../api/entreprises_liste.php', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      if (!rep.ok) throw new Error();
+      chargerEntreprises();
+      afficherToast('Entreprise ajoutée');
+    } catch(e) { afficherToast('Erreur'); }
+  }
+
+  // ---- Employés ----
+  async function chargerSelectEntreprises() {
+    try {
+      const rep = await fetch('../api/entreprises_liste.php');
+      const entreprises = await rep.json();
+      const select = document.getElementById('selectEntreprisePourEmployes');
+      select.innerHTML = '<option value="">Choisir une entreprise</option>' + entreprises.map(e => `<option value="${e.id}">${e.nom_entreprise}</option>`).join('');
+    } catch(e) {}
+  }
+
+  async function chargerEmployes() {
+    const entreprise_id = document.getElementById('selectEntreprisePourEmployes').value;
+    if (!entreprise_id) { document.getElementById('employesTableBody').innerHTML = ''; return; }
+    try {
+      const rep = await fetch(`../api/employes_liste.php?entreprise_id=${entreprise_id}`);
+      const employes = await rep.json();
+      const tbody = document.getElementById('employesTableBody');
+      tbody.innerHTML = employes.map(emp => `
+        <tr>
+          <td>${emp.nom}</td>
+          <td>${emp.prenom}</td>
+          <td>${emp.date_naissance || ''}</td>
+          <td>${emp.date_embauche || ''}</td>
+          <td><button class="act-btn act-delete" onclick="supprimerEmploye(${emp.id})">🗑</button></td>
+        </tr>
+      `).join('');
+    } catch(e) {}
+  }
+
+  function ouvrirModaleEmploye() {
+    const entreprise_id = document.getElementById('selectEntreprisePourEmployes').value;
+    if (!entreprise_id) { alert('Choisissez d\'abord une entreprise'); return; }
+    const nom = prompt('Nom :');
+    if (!nom) return;
+    const prenom = prompt('Prénom :');
+    if (!prenom) return;
+    const naissance = prompt('Date de naissance (AAAA-MM-JJ) :');
+    const embauche = prompt('Date d\'embauche (AAAA-MM-JJ) :');
+    ajouterEmploye(entreprise_id, nom, prenom, naissance, embauche);
+  }
+
+  async function ajouterEmploye(entreprise_id, nom, prenom, naissance, embauche) {
+    const body = ajouterCsrf({ entreprise_id, nom, prenom, date_naissance: naissance, date_embauche: embauche });
+    try {
+      const rep = await fetch('../api/employes_liste.php', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      if (!rep.ok) throw new Error();
+      chargerEmployes();
+      afficherToast('Employé ajouté');
+    } catch(e) { afficherToast('Erreur'); }
+  }
+
+  async function supprimerEmploye(id) {
+    if (!confirm('Supprimer cet employé ?')) return;
+    // API à créer : api/supprimer_employe.php
+    try {
+      await fetch(`../api/supprimer_employe.php?id=${id}`, { method:'DELETE' });
+      chargerEmployes();
+      afficherToast('Employé supprimé');
+    } catch(e) { afficherToast('Erreur'); }
+  }
+
+  // ---- Événements ----
+  async function chargerSelectEmployes() {
+    try {
+      const rep = await fetch('../api/employes_tous.php'); // à créer : liste tous les employés
+      const employes = await rep.json();
+      const select = document.getElementById('selectEmployePourEvenements');
+      select.innerHTML = '<option value="">Tous les employés</option>' + employes.map(e => `<option value="${e.id}">${e.nom} ${e.prenom} (${e.nom_entreprise})</option>`).join('');
+    } catch(e) {}
+  }
+
+   async function chargerEvenements() {
+    const employe_id = document.getElementById('selectEmployePourEvenements').value;
+    const url = employe_id ? `../api/evenements_liste.php?employe_id=${employe_id}` : '../api/evenements_liste.php';
+    try {
+      const rep = await fetch(url);
+      if (!rep.ok) throw new Error('Erreur réseau');
+      const events = await rep.json();
+      const tbody = document.getElementById('evenementsTableBody');
+      tbody.innerHTML = events.map(ev => `
+        <tr>
+          <td>${ev.nom || '?'} ${ev.prenom || ''}</td>
+          <td>${ev.type_evenement}</td>
+          <td>${ev.date_evenement}</td>
+          <td>${ev.description || ''}</td>
+        </tr>
+      `).join('');
+    } catch(e) {
+      afficherToast('Impossible de charger les événements');
+      console.error(e);
+    }
+  }
+
+  function ouvrirModaleEvenement() {
+    const employe_id = document.getElementById('selectEmployePourEvenements').value;
+    if (!employe_id) { alert('Sélectionnez un employé dans le filtre'); return; }
+    const type = prompt('Type (anniversaire, embauche, depart, autre) :');
+    if (!type) return;
+    const date = prompt('Date (AAAA-MM-JJ) :');
+    if (!date) return;
+    const desc = prompt('Description (optionnelle) :');
+    ajouterEvenement(employe_id, type, date, desc);
+  }
+
+  async function ajouterEvenement(employe_id, type, date, desc) {
+    const body = ajouterCsrf({ employe_id, type_evenement: type, date_evenement: date, description: desc });
+    try {
+      const rep = await fetch('../api/evenements_liste.php', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      if (!rep.ok) throw new Error();
+      chargerEvenements();
+      afficherToast('Événement ajouté');
+    } catch(e) { afficherToast('Erreur'); }
+  }
+
+    // ---- Modale générique (Entreprises, Employés, Événements) ----
+  function ouvrirModaleGenerique(titre, champs, callback) {
+    document.getElementById('modalGenericTitle').textContent = titre;
+    document.getElementById('modalGenericFields').innerHTML = champs;
+    document.getElementById('modalGenericBg').classList.add('show');
+
+    const btnSubmit = document.getElementById('modalGenericSubmit');
+    // Retirer l'ancien écouteur pour éviter les doublons
+    const newBtn = btnSubmit.cloneNode(true);
+    btnSubmit.parentNode.replaceChild(newBtn, btnSubmit);
+    newBtn.addEventListener('click', async () => {
+      const result = callback();
+      if (result !== false) {
+        fermerModaleGenerique();
+      }
+    });
+  }
+
+  function fermerModaleGenerique(e) {
+    if (e && e.target !== e.currentTarget) return; // fermer seulement si clic sur l'overlay
+    document.getElementById('modalGenericBg').classList.remove('show');
+  }
+
+  // ---- Modale Entreprise ----
+  function ouvrirModaleEntreprise() {
+    const champs = `
+      <div class="modal-field">
+        <label>Nom de l'entreprise</label>
+        <input class="modal-input" id="ent_nom" type="text" placeholder="Nom" required>
+      </div>
+      <div class="modal-field">
+        <label>Adresse</label>
+        <input class="modal-input" id="ent_adresse" type="text" placeholder="Adresse">
+      </div>
+      <div class="modal-field">
+        <label>Téléphone</label>
+        <input class="modal-input" id="ent_telephone" type="text" placeholder="+509 XXXX XXXX">
+      </div>
+      <div class="modal-field">
+        <label>Email</label>
+        <input class="modal-input" id="ent_email" type="email" placeholder="email@exemple.com">
+      </div>
+    `;
+    ouvrirModaleGenerique('Nouvelle Entreprise', champs, async () => {
+      const nom = document.getElementById('ent_nom').value.trim();
+      if (!nom) { afficherToast('Le nom est obligatoire.'); return false; }
+      await ajouterEntreprise(
+        nom,
+        document.getElementById('ent_adresse').value.trim(),
+        document.getElementById('ent_telephone').value.trim(),
+        document.getElementById('ent_email').value.trim()
+      );
+    });
+  }
+
+  // ---- Modale Employé ----
+  function ouvrirModaleEmploye() {
+    const entreprise_id = document.getElementById('selectEntreprisePourEmployes').value;
+    if (!entreprise_id) { afficherToast('Choisissez d\'abord une entreprise.'); return; }
+    const champs = `
+      <div class="modal-field">
+        <label>Nom</label>
+        <input class="modal-input" id="emp_nom" type="text" required>
+      </div>
+      <div class="modal-field">
+        <label>Prénom</label>
+        <input class="modal-input" id="emp_prenom" type="text" required>
+      </div>
+      <div class="modal-field">
+        <label>Date de naissance</label>
+        <input class="modal-input" id="emp_naissance" type="date">
+      </div>
+      <div class="modal-field">
+        <label>Date d'embauche</label>
+        <input class="modal-input" id="emp_embauche" type="date">
+      </div>
+    `;
+    ouvrirModaleGenerique('Nouvel Employé', champs, async () => {
+      const nom = document.getElementById('emp_nom').value.trim();
+      const prenom = document.getElementById('emp_prenom').value.trim();
+      if (!nom || !prenom) { afficherToast('Nom et prénom requis.'); return false; }
+      await ajouterEmploye(
+        entreprise_id,
+        nom,
+        prenom,
+        document.getElementById('emp_naissance').value,
+        document.getElementById('emp_embauche').value
+      );
+    });
+  }
+
+  // ---- Modale Événement ----
+  function ouvrirModaleEvenement() {
+    const employe_id = document.getElementById('selectEmployePourEvenements').value;
+    if (!employe_id) { afficherToast('Sélectionnez d\'abord un employé dans le filtre.'); return; }
+    const champs = `
+      <div class="modal-field">
+        <label>Type d'événement</label>
+        <select class="modal-select" id="ev_type">
+          <option value="anniversaire">Anniversaire</option>
+          <option value="embauche">Embauche</option>
+          <option value="depart">Départ</option>
+          <option value="autre">Autre</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>Date</label>
+        <input class="modal-input" id="ev_date" type="date" required>
+      </div>
+      <div class="modal-field">
+        <label>Description</label>
+        <input class="modal-input" id="ev_description" type="text" placeholder="Optionnel">
+      </div>
+    `;
+    ouvrirModaleGenerique('Nouvel Événement', champs, async () => {
+      const date = document.getElementById('ev_date').value;
+      if (!date) { afficherToast('La date est obligatoire.'); return false; }
+      await ajouterEvenement(
+        employe_id,
+        document.getElementById('ev_type').value,
+        date,
+        document.getElementById('ev_description').value.trim()
+      );
+    });
+  }
+
+    let rapportData = []; // stocke les données chargées pour l'export CSV
+
+  async function chargerRapport() {
+    const debut = document.getElementById('rapportDateDebut').value;
+    const fin = document.getElementById('rapportDateFin').value;
+    const type = document.getElementById('rapportType').value;
+
+    // Validation rapide
+    if (!debut || !fin) {
+      afficherToast('Veuillez choisir une période.');
+      return;
+    }
+
+    try {
+      const rep = await fetch(`../api/rapports.php?type=${type}&debut=${debut}&fin=${fin}`);
+      if (!rep.ok) throw new Error('Erreur');
+      rapportData = await rep.json();
+      afficherRapport(rapportData, type);
+    } catch(e) {
+      afficherToast('Erreur de chargement du rapport');
+    }
+  }
+
+  function afficherRapport(data, type) {
+    const tbody = document.getElementById('rapportBody');
+    const header = document.getElementById('rapportHeader');
+    const totalEl = document.getElementById('rapportTotal');
+    const footer = document.getElementById('rapportFooter');
+
+    if (data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Aucun résultat</td></tr>';
+      totalEl.textContent = '';
+      footer.textContent = '';
+      return;
+    }
+
+    // Adapter les en-têtes selon le type (pour l'instant on ne gère que 'reservations')
+    if (type === 'reservations') {
+      header.innerHTML = '<th>ID</th><th>Client</th><th>Service</th><th>Date</th><th>Statut</th><th>Payé</th>';
+      tbody.innerHTML = data.map(r => `
+        <tr>
+          <td>#${r.id}</td>
+          <td>${r.client || ''}</td>
+          <td>${r.service || ''}</td>
+          <td>${r.date_formatee}</td>
+          <td><span class="badge badge-${r.statut === 'confirmee' ? 'confirmed' : 'pending'}">${r.statut}</span></td>
+          <td>${r.est_payee ? '✅' : '❌'}</td>
+        </tr>
+      `).join('');
+      footer.textContent = `Total : ${data.length} réservation(s)`;
+      totalEl.textContent = '';
+    } else if (type === 'validations') {
+      // Pour plus tard
+      tbody.innerHTML = '<tr><td colspan="6">Fonctionnalité à venir</td></tr>';
+    }
+  }
+
+  function exporterCSV() {
+    if (rapportData.length === 0) {
+      afficherToast('Aucune donnée à exporter.');
+      return;
+    }
+
+    const type = document.getElementById('rapportType').value;
+    let csvContent = '';
+    let filename = '';
+
+    if (type === 'reservations') {
+      filename = 'reservations.csv';
+      csvContent = 'ID,Client,Service,Date,Statut,Payé\n';
+      rapportData.forEach(r => {
+        csvContent += `#${r.id},${r.client || ''},${r.service || ''},${r.date_formatee},${r.statut},${r.est_payee ? 'Oui' : 'Non'}\n`;
+      });
+    } else {
+      afficherToast('Export non disponible pour ce type.');
+      return;
+    }
+
+    // Créer un blob et déclencher le téléchargement
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' }); // BOM pour Excel
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    afficherToast('Export terminé');
+  }
+
+    async function changerMotDePasse(e) {
+    e.preventDefault();
+    const ancien = document.getElementById('ancienMdp').value.trim();
+    const nouveau = document.getElementById('nouveauMdp').value.trim();
+    const msgDiv = document.getElementById('msgChangementMdp');
+    msgDiv.style.display = 'none';
+
+    if (!ancien || !nouveau) return afficherToast('Tous les champs sont requis.');
+
+    const body = ajouterCsrf({ ancien_mot_de_passe: ancien, nouveau_mot_de_passe: nouveau });
+    try {
+      const rep = await fetch('../api/changer_mot_de_passe.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await rep.json();
+      if (!rep.ok) throw new Error(data.erreur);
+      msgDiv.style.display = 'block';
+      msgDiv.style.background = '#e8f5e9';
+      msgDiv.style.color = '#2e7d32';
+      msgDiv.style.padding = '10px';
+      msgDiv.style.borderRadius = '8px';
+      msgDiv.textContent = data.message;
+      document.getElementById('formChangerMotDePasse').reset();
+    } catch (err) {
+      msgDiv.style.display = 'block';
+      msgDiv.style.background = '#ffebee';
+      msgDiv.style.color = '#c62828';
+      msgDiv.style.padding = '10px';
+      msgDiv.style.borderRadius = '8px';
+      msgDiv.textContent = err.message;
+    }
+  }
+
+  // Initialisation principale
+  async function init() {
+    try {
+      const rep = await fetch('../api/verifier_session.php');
+      if (!rep.ok) throw new Error('Non autorisé');
+      const sessionData = await rep.json();
+      roleUtilisateur = sessionData.role;
+
+      document.body.classList.add('ready');
+
+      await chargerCsrf();
+      await chargerServices();
+
+      construireMenu();
+
+      await chargerReservations();
+      chargerStats();  // charger les stats pour tous les rôles, avec l'endpoint approprié
+
+    } catch(e) {
+      window.location.href = 'admin-login.html';
+    }
+  }
+
+  async function chargerServices() {
+    try {
+      const rep = await fetch(API_SERVICES);
+      servicesListe = await rep.json();
+      const select = document.getElementById('mService');
+      select.innerHTML = servicesListe.map(s => `<option value="${s.id}">${s.nom} - ${s.prix} HTG</option>`).join('');
+    } catch(e) {}
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

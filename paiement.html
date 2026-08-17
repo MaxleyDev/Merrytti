@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement – Merrytti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+        h1 { margin-top: 0; font-size: 26px; }
+        .resume { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 25px; }
+        .resume p { margin: 8px 0; font-size: 15px; }
+        .field { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; }
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        input:focus { outline: none; border-color: #c62828; }
+        .card-row { display: flex; gap: 15px; }
+        .card-row .field { flex: 1; }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #c62828;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover { background: #b31e1e; }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        a { color: #c62828; text-decoration: none; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Paiement Sécurisé</h1>
+        <div id="resumePaiement" class="resume">Chargement…</div>
+
+        <div class="error" id="erreurPaiement"></div>
+
+        <form id="formPaiement">
+            <div class="field">
+                <label for="titulaire">Titulaire de la carte</label>
+                <input type="text" id="titulaire" placeholder="Ex: Jean Dupont" required>
+            </div>
+            <div class="field">
+                <label for="numeroCarte">Numéro de carte</label>
+                <input type="text" id="numeroCarte" placeholder="1234 5678 9012 3456" required maxlength="19" inputmode="numeric">
+            </div>
+            <div class="card-row">
+                <div class="field">
+                    <label for="expiration">Expiration (MM/AA)</label>
+                    <input type="text" id="expiration" placeholder="MM/AA" required maxlength="5">
+                </div>
+                <div class="field">
+                    <label for="cvv">CVV</label>
+                    <input type="text" id="cvv" placeholder="123" required maxlength="4" inputmode="numeric">
+                </div>
+            </div>
+            <button type="submit">Payer maintenant</button>
+        </form>
+
+        <p style="text-align:center; margin-top:20px;"><a href="index.html">Annuler et retour à l'accueil</a></p>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const reservationId = params.get('reservation_id');
+
+        async function chargerResume() {
+            if (!reservationId) {
+                document.getElementById('resumePaiement').innerHTML = '<p style="color:red;">Réservation introuvable.</p>';
+                return;
+            }
+            try {
+                // Récupérer les détails de la réservation (utiliser l'API profil réservations filtrée ? on va utiliser reservations.php?non)
+                // Créons plutôt une petite API pour une réservation unique : api/reservation_detail.php
+                // Pour simplifier, on va utiliser le fait que la réservation vient d'être créée par le même utilisateur,
+                // donc on peut appeler profil.php? Mais profil.php renvoie toutes les résas. On va créer une API rapide.
+                // On va faire un fetch vers api/une_reservation.php?id=reservationId
+                // Je vais créer ce fichier pour vous ci-dessous.
+                const rep = await fetch(`api/une_reservation.php?id=${reservationId}`);
+                if (!rep.ok) throw new Error('Réservation non trouvée');
+                const resa = await rep.json();
+                document.getElementById('resumePaiement').innerHTML = `
+                    <p><strong>Service :</strong> ${resa.service}</p>
+                    <p><strong>Date :</strong> ${resa.date_formatee}</p>
+                    <p><strong>Montant :</strong> ${resa.prix} HTG</p>
+                    <p style="font-weight:600; color:#c62828;">À payer : ${resa.prix} HTG</p>
+                `;
+            } catch(e) {
+                document.getElementById('resumePaiement').innerHTML = '<p style="color:red;">Impossible de charger les détails de la réservation.</p>';
+            }
+        }
+        chargerResume();
+
+        document.getElementById('formPaiement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const erreur = document.getElementById('erreurPaiement');
+            erreur.style.display = 'none';
+
+            const titulaire = document.getElementById('titulaire').value.trim();
+            const numero = document.getElementById('numeroCarte').value.trim();
+            const expiration = document.getElementById('expiration').value.trim();
+            const cvv = document.getElementById('cvv').value.trim();
+
+            if (!titulaire || !numero || !expiration || !cvv) {
+                erreur.textContent = 'Tous les champs sont requis.';
+                erreur.style.display = 'block';
+                return;
+            }
+
+            // Validation simple
+            if (numero.replace(/\s/g, '').length < 13) {
+                erreur.textContent = 'Numéro de carte invalide.';
+                erreur.style.display = 'block';
+                return;
+            }
+
+            try {
+                const rep = await fetch('api/paiement.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reservation_id: reservationId, titulaire, numero, expiration, cvv })
+                });
+                const data = await rep.json();
+                if (!rep.ok) throw new Error(data.erreur || 'Erreur de paiement');
+                // Rediriger vers la page de succès
+                window.location.href = `paiement-succes.html?reservation_id=${reservationId}`;
+            } catch(err) {
+                erreur.textContent = err.message;
+                erreur.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vérifier une carte cadeau – Merrytti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <!-- Bibliothèque QR Code -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 550px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 26px;
+            margin-bottom: 8px;
+            color: #1A1A1A;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 28px;
+            font-size: 15px;
+        }
+        .field {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #c62828;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #c62828;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #b31e1e;
+        }
+        .result {
+            margin-top: 24px;
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+            display: none;
+        }
+        .result.show {
+            display: block;
+        }
+        .result-item {
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        .result-item strong {
+            display: inline-block;
+            width: 160px;
+            color: #555;
+        }
+        .message {
+            margin-top: 12px;
+            padding: 12px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .message.warning {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        .message.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #c62828;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        #qrcode-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vérifier une carte cadeau</h1>
+        <p class="subtitle">Entrez le code unique de votre carte pour découvrir son contenu.</p>
+
+        <form id="formVerifier">
+            <div class="field">
+                <label for="code">Code de la carte</label>
+                <input type="text" id="code" placeholder="Ex: 4F8A9C2E7B3D" required>
+            </div>
+            <button type="submit">Vérifier</button>
+        </form>
+
+        <div class="result" id="resultContainer">
+            <h2 style="margin:0 0 15px; font-size:20px;">Détails du cadeau</h2>
+            <div id="resultDetails"></div>
+            <div id="qrcode-container"></div>
+            <div id="resultMessage" class="message"></div>
+        </div>
+
+        <a href="index.html">← Retour à l'accueil</a>
+    </div>
+
+    <script>
+        // Nettoyer le conteneur QR avant d'en générer un nouveau
+        function genererQRCode(texte) {
+            const container = document.getElementById('qrcode-container');
+            container.innerHTML = ''; // vide le conteneur
+            new QRCode(container, {
+                text: texte,
+                width: 150,
+                height: 150
+            });
+        }
+
+        document.getElementById('formVerifier').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const code = document.getElementById('code').value.trim();
+            const container = document.getElementById('resultContainer');
+            const details = document.getElementById('resultDetails');
+            const msg = document.getElementById('resultMessage');
+            container.classList.remove('show');
+            details.innerHTML = '';
+            msg.textContent = '';
+            msg.className = 'message';
+            document.getElementById('qrcode-container').innerHTML = '';
+
+            if (!code) return;
+
+            try {
+                const rep = await fetch('api/verifier_carte.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                const data = await rep.json();
+                if (!rep.ok) throw new Error(data.erreur);
+
+                details.innerHTML = `
+                    <div class="result-item"><strong>Service :</strong> ${data.service}</div>
+                    <div class="result-item"><strong>Description :</strong> ${data.description || '—'}</div>
+                    <div class="result-item"><strong>Valeur :</strong> ${data.prix} HTG</div>
+                    <div class="result-item"><strong>Expiration :</strong> ${data.date_expiration}</div>
+                    <div class="result-item"><strong>Statut :</strong> ${data.statut}</div>
+                `;
+                msg.textContent = data.message;
+                if (data.statut === 'utilisee' || data.statut === 'expiree') {
+                    msg.classList.add('warning');
+                } else {
+                    msg.classList.add('success');
+                }
+                // Générer un QR code qui pointe vers cette page avec le code pré-rempli
+                const urlLookup = `${window.location.origin}/carte-cadeau.html?code=${encodeURIComponent(code)}`;
+                genererQRCode(urlLookup);
+                container.classList.add('show');
+            } catch (err) {
+                msg.textContent = err.message;
+                msg.classList.add('error');
+                container.classList.add('show');
+            }
+        });
+
+        // Pré-remplir le champ si un paramètre 'code' est présent dans l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const codeFromUrl = urlParams.get('code');
+        if (codeFromUrl) {
+            document.getElementById('code').value = codeFromUrl;
+        }
+    </script>
+</body>
+</html>

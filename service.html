@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail du Service – Merrytti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .price {
+            font-size: 28px;
+            font-weight: 800;
+            color: #c62828;
+            margin: 10px 0;
+        }
+        .description {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .btn-reserver {
+            display: inline-block;
+            padding: 14px 28px;
+            background: #c62828;
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #c62828;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+   
+
+    <div class="container" id="serviceDetail">
+        <p>Chargement…</p>
+    </div>
+
+    <script>
+        async function chargerService() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (!id) {
+                document.getElementById('serviceDetail').innerHTML = '<p>Service non trouvé.</p>';
+                return;
+            }
+            try {
+                const rep = await fetch(`api/service.php?id=${id}`);
+                if (!rep.ok) throw new Error('Service introuvable');
+                const service = await rep.json();
+                document.getElementById('serviceDetail').innerHTML = `
+                    <h1>${service.nom}</h1>
+                    <div class="price">${service.prix} HTG</div>
+                    <p class="description">${service.description || 'Un cadeau exceptionnel.'}</p>
+                    <a href="reservation.html?service_id=${service.id}" class="btn-reserver">Réserver ce cadeau</a>
+                    <br>
+                    <a href="boutique.html">← Retour à la boutique</a>
+                `;
+            } catch(e) {
+                document.getElementById('serviceDetail').innerHTML = '<p>Service non trouvé.</p>';
+            }
+        }
+        chargerService();
+    </script>
+
+    <script>
+    async function mettreAJourNavbar() {
+        try {
+            const rep = await fetch('api/session.php');
+            const data = await rep.json();
+            const navAuth = document.getElementById('navAuth');
+            if (data.connecte) {
+                navAuth.innerHTML = `<a href="profil.html" class="btn btn-outline btn-sm">${data.nom_utilisateur}</a>`;
+            } else {
+                navAuth.innerHTML = `<a href="connexion.html" class="btn btn-outline btn-sm">Connexion</a>`;
+            }
+        } catch(e) {
+            // garder l’affichage par défaut
+        }
+    }
+    mettreAJourNavbar();
+</script>
+</body>
+</html>

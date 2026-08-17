@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact – Merrytti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .page-content { max-width: 600px; margin: 60px auto; padding: 0 20px; }
+        h1 { font-size: 32px; margin-bottom: 20px; }
+        .field { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; }
+        button { padding: 12px 28px; background: #c62828; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+        .success { background: #e8f5e9; color: #2e7d32; padding: 15px; border-radius: 8px; margin-top: 20px; display: none; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-inner">
+            <a href="index.html" class="logo-wrap">
+                <img src="assets/logo.png" alt="Merrytti Logo" height="40">
+                <span class="brand-color">Merrytti</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="boutique.html">Boutique</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+            </ul>
+            <div class="nav-right" id="navAuth">
+                <a href="connexion.html" class="btn btn-outline btn-sm">Connexion</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content">
+        <h1>Contactez-nous</h1>
+        <p style="margin-bottom:30px;">Une question ? Une demande spéciale ? Écrivez-nous.</p>
+
+        <form id="formContact">
+            <div class="field">
+                <label for="nom">Nom</label>
+                <input type="text" id="nom" required>
+            </div>
+            <div class="field">
+                <label for="email">Email</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="field">
+                <label for="message">Message</label>
+                <textarea id="message" rows="5" required></textarea>
+            </div>
+            <button type="submit">Envoyer</button>
+        </form>
+        <div class="success" id="successMsg">✅ Message envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.</div>
+
+        <div style="margin-top:40px;">
+            <h3>FAQ</h3>
+            <p><strong>Comment fonctionne une carte cadeau ?</strong><br>Vous choisissez un service, réservez, et nous générons une carte avec un code unique que le destinataire peut consulter sur notre page de vérification.</p>
+            <p><strong>Puis-je annuler une réservation ?</strong><br>Les annulations sont possibles jusqu'à 48h avant la date prévue. Contactez-nous pour toute demande.</p>
+            <p><strong>Les cartes ont-elles une date d’expiration ?</strong><br>Oui, chaque carte est valable 1 mois à partir de sa génération.</p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">&copy; 2026 Merrytti. Tous droits réservés.</div>
+        </div>
+    </footer>
+
+    <script>
+        async function mettreAJourNavbar() {
+            try {
+                const rep = await fetch('api/session.php');
+                const data = await rep.json();
+                const navAuth = document.getElementById('navAuth');
+                if (data.connecte) {
+                    navAuth.innerHTML = `<a href="profil.html" class="btn btn-outline btn-sm">${data.nom_utilisateur}</a>`;
+                } else {
+                    navAuth.innerHTML = `<a href="connexion.html" class="btn btn-outline btn-sm">Connexion</a>`;
+                }
+            } catch(e) {}
+        }
+        mettreAJourNavbar();
+
+        document.getElementById('formContact').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // Simuler l'envoi – plus tard on peut l'envoyer à une API
+            document.getElementById('successMsg').style.display = 'block';
+            document.getElementById('formContact').reset();
+        });
+    </script>
+</body>
+</html>

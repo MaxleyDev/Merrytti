@@ -1,0 +1,293 @@
+/* ── VARIABLES ── */
+    :root {
+      --red:        #D52B2B;
+      --red-dark:   #B31E1E;
+      --red-bg:     #FFF0F0;
+      --red-light:  #FDEAEA;
+      --text:       #1A1A1A;
+      --text-mid:   #555555;
+      --text-light: #999999;
+      --white:      #ffffff;
+      --bg:         #F6F6F6;
+      --border:     #E0E0E0;
+      --radius:     10px;
+      --nav-h:      60px;
+      --bottom-h:   64px;
+      --font:       'Inter', sans-serif;
+    }
+
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ════════════════════════════════
+       BARRE DE NAVIGATION SUPÉRIEURE
+    ════════════════════════════════ */
+    .navbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      height: var(--nav-h);
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center;
+      padding: 0 20px;
+    }
+    .nav-inner {
+      width: 100%; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 800; font-size: 20px; color: var(--text);
+      text-decoration: none;
+    }
+    /* Icône du logo – remplacer par <img src="logo.png" height="30"> */
+    .logo-icon {
+      width: 30px; height: 30px; background: var(--red);
+      border-radius: 7px; display: flex; align-items: center;
+      justify-content: center; font-size: 15px;
+    }
+
+    .user-btn {
+      display: flex; align-items: center; gap: 7px;
+      font-family: var(--font); font-size: 14px; font-weight: 500;
+      color: var(--text-mid); background: none; border: none;
+      cursor: pointer; padding: 6px 0; transition: color .2s;
+    }
+    .user-btn:hover { color: var(--text); }
+    .user-btn .u-icon svg {
+      width: 18px; height: 18px;
+      stroke: currentColor; fill: none;
+      stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .user-btn .chevron svg {
+      width: 13px; height: 13px;
+      stroke: currentColor; fill: none; stroke-width: 2.5;
+    }
+
+    /* ════════════════════════════════
+       CONTENU PRINCIPAL
+    ════════════════════════════════ */
+    .main {
+      flex: 1;
+      padding: 28px 20px calc(var(--bottom-h) + 20px);
+      max-width: 480px; width: 100%; margin: 0 auto;
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      margin-top: 15px;
+    }
+
+    .page-title {
+      font-size: 22px; font-weight: 800;
+      color: var(--text); margin-bottom: 4px;
+    }
+    .page-subtitle {
+      font-size: 13.5px; color: var(--text-mid); margin-bottom: 28px;
+    }
+
+    /* ── CHAMPS DU FORMULAIRE ── */
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block; font-size: 14px; font-weight: 600;
+      color: var(--text); margin-bottom: 8px;
+    }
+
+     .logo-wrap {
+      flex-shrink: 0; height: 40px;
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 800; font-size: 22px; color: var(--text);
+       text-decoration: none;
+    }
+
+    .brand-color { color: var(--red); }
+
+    /* Champ texte */
+    .input-wrap {
+      display: flex; align-items: center;
+      border: 1.5px solid var(--border); border-radius: var(--radius);
+      background: var(--white); overflow: hidden;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .input-wrap:focus-within {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(213,43,43,.1);
+    }
+    .input-wrap .icon {
+      padding: 0 12px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-light); flex-shrink: 0;
+    }
+    .input-wrap .icon svg {
+      width: 18px; height: 18px;
+      stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .input-wrap input {
+      flex: 1; border: none; outline: none;
+      padding: 13px 12px 13px 0;
+      font-family: var(--font); font-size: 14.5px; color: var(--text);
+      background: transparent;
+    }
+    .input-wrap input::placeholder { color: var(--text-light); }
+
+    /* Liste déroulante */
+    .select-wrap {
+      position: relative;
+      border: 1.5px solid var(--border); border-radius: var(--radius);
+      background: var(--white); overflow: hidden;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .select-wrap:focus-within {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(213,43,43,.1);
+    }
+    .select-wrap select {
+      width: 100%; padding: 13px 40px 13px 14px;
+      font-family: var(--font); font-size: 14.5px; color: var(--text);
+      border: none; outline: none; background: transparent;
+      appearance: none; -webkit-appearance: none; cursor: pointer;
+    }
+    .select-wrap .sel-arrow {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      pointer-events: none; color: var(--text-mid);
+    }
+    .select-wrap .sel-arrow svg {
+      width: 16px; height: 16px;
+      stroke: currentColor; fill: none; stroke-width: 2.5;
+    }
+
+    /* Champ date/heure */
+    .datetime-wrap {
+      display: flex; align-items: center;
+      border: 1.5px solid var(--border); border-radius: var(--radius);
+      background: var(--white); overflow: hidden;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .datetime-wrap:focus-within {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(213,43,43,.1);
+    }
+    .datetime-wrap input[type="datetime-local"] {
+      flex: 1; padding: 13px 14px;
+      font-family: var(--font); font-size: 14.5px; color: var(--text);
+      border: none; outline: none; background: transparent;
+      cursor: pointer;
+    }
+    .datetime-wrap input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+      opacity: 0; position: absolute; right: 14px; width: 22px; height: 22px; cursor: pointer;
+    }
+    .dt-icon {
+      padding: 0 14px 0 0; color: var(--text-mid);
+      pointer-events: none; display: flex; align-items: center;
+    }
+    .dt-icon svg {
+      width: 19px; height: 19px;
+      stroke: currentColor; fill: none;
+      stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    /* ── BOUTON DE SOUMISSION ── */
+    .btn-submit {
+      width: 100%; margin-top: 4px; padding: 15px;
+      background: var(--red); color: var(--white);
+      border: none; border-radius: var(--radius);
+      font-family: var(--font); font-size: 16px; font-weight: 700;
+      cursor: pointer; letter-spacing: .2px;
+      transition: background .2s, transform .15s;
+    }
+    .btn-submit:hover  { background: var(--red-dark); }
+    .btn-submit:active { transform: scale(.98); }
+    .btn-submit:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+
+    /* ── MESSAGE DE SUCCÈS ── */
+    .success-msg {
+      background: #f0fdf4; border: 1px solid #86efac;
+      border-radius: var(--radius); padding: 13px 16px;
+      font-size: 14px; color: #166534; font-weight: 500;
+      margin-bottom: 18px; display: none; align-items: center; gap: 10px;
+    }
+    .success-msg.show { display: flex; }
+
+    /* ── MESSAGE D'ERREUR ── */
+    .error-msg {
+      background: var(--red-light); border: 1px solid rgba(213,43,43,.25);
+      border-radius: var(--radius); padding: 13px 16px;
+      font-size: 14px; color: var(--red); font-weight: 500;
+      margin-bottom: 18px; display: none; align-items: center; gap: 10px;
+    }
+    .error-msg.show { display: flex; }
+
+    /* ── CARTE SERVICE CLIENT ── */
+    .support-card {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px;
+      margin-top: 24px;
+    }
+    .support-icon {
+      width: 42px; height: 42px; flex-shrink: 0;
+      border: 1.5px solid var(--border); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-mid);
+    }
+    .support-icon svg {
+      width: 20px; height: 20px;
+      stroke: currentColor; fill: none;
+      stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .support-text strong {
+      display: block; font-size: 14.5px; font-weight: 700; color: var(--text);
+    }
+    .support-text span {
+      font-size: 13.5px; color: var(--text-mid);
+    }
+
+    /* ════════════════════════════════
+       BARRE DE NAVIGATION INFÉRIEURE
+    ════════════════════════════════ */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: var(--bottom-h);
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center;
+      z-index: 50;
+    }
+    .bottom-nav-inner {
+      width: 100%; max-width: 480px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      height: 100%;
+    }
+    .nav-tab {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 4px;
+      font-size: 11.5px; font-weight: 500; color: var(--text-light);
+      text-decoration: none; cursor: pointer;
+      transition: color .2s;
+      background: none; border: none; font-family: var(--font);
+      padding: 0;
+    }
+    .nav-tab:hover { color: var(--text-mid); }
+    .nav-tab.active { color: var(--red); }
+    .nav-tab svg {
+      width: 22px; height: 22px;
+      stroke: currentColor; fill: none;
+      stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+      transition: stroke .2s;
+    }
+    .nav-tab.active svg { stroke: var(--red); }
+
+    /* ════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════ */
+    @media (min-width: 600px) {
+      .main { padding-top: 40px; }
+      .page-title { font-size: 26px; }
+    }

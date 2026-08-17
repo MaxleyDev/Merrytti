@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord Partenaire – Merrytti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f5f5f5; margin: 0; display: none; }
+        body.ready { display: block; }
+        .container { max-width: 900px; margin: 40px auto; padding: 20px; }
+        .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        h1 { margin-top: 0; }
+        .stat { display: flex; gap: 20px; margin-bottom: 15px; }
+        .stat-box { flex: 1; background: #f9f9f9; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-box .value { font-size: 24px; font-weight: 700; color: #c62828; }
+        .stat-box .label { font-size: 13px; color: #777; }
+        .field { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+        button { padding: 12px 24px; background: #c62828; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .result { padding: 15px; border-radius: 8px; margin-top: 15px; display: none; }
+        .result.success { background: #e8f5e9; color: #2e7d32; }
+        .result.error { background: #ffebee; color: #c62828; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        .logout { display: inline-block; margin-top: 15px; color: #c62828; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h1>Portail Partenaire</h1>
+        <p>Bienvenue, <span id="nomPartenaire"></span></p>
+        <span class="logout" onclick="deconnexion()">Déconnexion</span>
+    </div>
+
+    <div class="card">
+        <h2>Validation de carte cadeau</h2>
+        <p>Entrez le code de la carte pour valider le cadeau.</p>
+        <div class="field">
+            <label for="codeCarte">Code unique</label>
+            <input type="text" id="codeCarte" placeholder="Ex: 4F8A9C2E7B3D">
+        </div>
+        <button onclick="validerCarte()">Valider la carte</button>
+        <div class="result" id="resultValidation"></div>
+    </div>
+
+    <div class="card">
+        <div class="stat">
+            <div class="stat-box">
+                <div class="value" id="totalValidations">0</div>
+                <div class="label">Validations effectuées</div>
+            </div>
+            <div class="stat-box">
+                <div class="value" id="totalMontant">0 HTG</div>
+                <div class="label">Montant total dû</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Historique des validations</h2>
+        <table>
+            <thead><tr><th>Date</th><th>Code</th><th>Service</th><th>Prix</th></tr></thead>
+            <tbody id="historiqueBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    async function verifierSession() {
+        try {
+            const rep = await fetch('../api/partenaire_session.php');
+            if (!rep.ok) throw new Error('Non connecté');
+            const data = await rep.json();
+            document.getElementById('nomPartenaire').textContent = data.nom_entreprise;
+            document.body.classList.add('ready');
+            chargerStats();
+            chargerHistorique();
+        } catch(e) {
+            window.location.href = 'login.html';
+        }
+    }
+
+    async function chargerStats() {
+        try {
+            const rep = await fetch('../api/partenaire_stats.php');
+            const stats = await rep.json();
+            document.getElementById('totalValidations').textContent = stats.total_validations;
+            document.getElementById('totalMontant').textContent = stats.total_montant + ' HTG';
+        } catch(e) {}
+    }
+
+    async function chargerHistorique() {
+        try {
+            const rep = await fetch('../api/partenaire_historique.php');
+            const validations = await rep.json();
+            const tbody = document.getElementById('historiqueBody');
+            tbody.innerHTML = validations.map(v => `
+                <tr>
+                    <td>${new Date(v.date_validation).toLocaleString('fr-FR')}</td>
+                    <td>${v.code}</td>
+                    <td>${v.service}</td>
+                    <td>${v.prix} HTG</td>
+                </tr>
+            `).join('');
+        } catch(e) {}
+    }
+
+    async function validerCarte() {
+        const code = document.getElementById('codeCarte').value.trim();
+        const resultDiv = document.getElementById('resultValidation');
+        resultDiv.style.display = 'none';
+        if (!code) {
+            resultDiv.textContent = 'Veuillez entrer un code.';
+            resultDiv.className = 'result error';
+            resultDiv.style.display = 'block';
+            return;
+        }
+        try {
+            const rep = await fetch('../api/partenaire_valider_carte.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code })
+            });
+            const data = await rep.json();
+            if (!rep.ok) throw new Error(data.erreur);
+            resultDiv.textContent = data.message + ' Service : ' + data.service + ' (' + data.prix + ' HTG)';
+            resultDiv.className = 'result success';
+            chargerStats();
+            chargerHistorique();
+            document.getElementById('codeCarte').value = '';
+        } catch(err) {
+            resultDiv.textContent = err.message;
+            resultDiv.className = 'result error';
+        }
+        resultDiv.style.display = 'block';
+    }
+
+    async function deconnexion() {
+        await fetch('../api/deconnexion_partenaire.php');
+        window.location.href = 'login.html';
+    }
+
+    verifierSession();
+</script>
+</body>
+</html>

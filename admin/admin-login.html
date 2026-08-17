@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merrytti – Administration</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 { margin-bottom: 10px; font-size: 24px; }
+        p { color: #666; margin-bottom: 30px; }
+        .field { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 6px; font-weight: 500; }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #c62828;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>Administration Merrytti</h1>
+        <p>Connectez-vous pour accéder au tableau de bord</p>
+        <div class="error" id="msgErreur"></div>
+        <form id="formConnexion">
+            <div class="field">
+                <label for="nom_utilisateur">Nom d'utilisateur</label>
+                <input type="text" id="nom_utilisateur" required>
+            </div>
+            <div class="field">
+                <label for="mot_de_passe">Mot de passe</label>
+                <input type="password" id="mot_de_passe" required>
+            </div>
+            <button type="submit">Connexion</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('formConnexion').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msgErreur = document.getElementById('msgErreur');
+            msgErreur.style.display = 'none';
+            
+            const nom_utilisateur = document.getElementById('nom_utilisateur').value.trim();
+            const mot_de_passe = document.getElementById('mot_de_passe').value;
+
+            try {
+                const reponse = await fetch('../api/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nom_utilisateur, mot_de_passe })
+                });
+                const data = await reponse.json();
+                if (!reponse.ok) throw new Error(data.erreur || 'Erreur de connexion');
+                
+                // Redirection vers le tableau de bord
+                window.location.href = 'tableau-de-bord.html';
+            } catch (err) {
+                msgErreur.textContent = err.message;
+                msgErreur.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

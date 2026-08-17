@@ -1,0 +1,179 @@
+ /* ── VARIABLES ── */
+    :root {
+      --red:      #D52B2B;
+      --red-dark: #B31E1E;
+      --red-bg:   #FFF0F0;
+      --text:     #1A1A1A;
+      --text-mid: #555555;
+      --text-light:#999999;
+      --white:    #ffffff;
+      --bg:       #F5F5F5;
+      --border:   #E0E0E0;
+      --radius:   10px;
+      --font:     'Inter', sans-serif;
+    }
+
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* ── BARRE DE NAVIGATION ── */
+    .navbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      height: 60px;
+      display: flex; align-items: center;
+      padding: 0 24px;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .nav-inner {
+      width: 100%; max-width: 1140px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 800; font-size: 20px; color: var(--text);
+      text-decoration: none;
+    }
+    /* Icône du logo – remplacer par <img src="logo.png" height="32"> */
+    .logo-icon {
+      width: 32px; height: 32px; background: var(--red);
+      border-radius: 7px; display: flex; align-items: center;
+      justify-content: center; font-size: 16px;
+    }
+
+    .logo-wrap {
+      flex-shrink: 0; height: 40px;
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 800; font-size: 22px; color: var(--text);
+       text-decoration: none;
+    }
+
+    .brand-color { color: var(--red); }
+    .lang-btn {
+      display: flex; align-items: center; gap: 5px;
+      font-family: var(--font); font-size: 14px; font-weight: 500;
+      color: var(--text-mid); background: none; border: none;
+      cursor: pointer; padding: 6px 4px; transition: color .2s;
+    }
+    .lang-btn:hover { color: var(--text); }
+    .lang-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+    /* ── MISE EN PAGE ── */
+    .page {
+      min-height: calc(100vh - 60px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 32px 16px;
+    }
+
+    /* ── CARTE DE CONNEXION ── */
+    .card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 40px 36px 36px;
+      width: 100%; max-width: 400px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    .card-title {
+      font-size: 26px; font-weight: 700;
+      text-align: center; margin-bottom: 6px;
+    }
+    .card-subtitle {
+      font-size: 14px; color: var(--text-mid);
+      text-align: center; margin-bottom: 28px;
+    }
+
+    /* ── FORMULAIRE ── */
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block; font-size: 14px; font-weight: 600;
+      margin-bottom: 8px; color: var(--text);
+    }
+    .input-wrap {
+      display: flex; align-items: center;
+      border: 1.5px solid var(--border); border-radius: var(--radius);
+      background: var(--white); overflow: hidden;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .input-wrap:focus-within {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(213,43,43,.1);
+    }
+    .input-wrap .icon {
+      padding: 0 12px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-light); flex-shrink: 0;
+    }
+    .input-wrap .icon svg {
+      width: 18px; height: 18px;
+      stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .input-wrap input {
+      flex: 1; border: none; outline: none;
+      padding: 13px 12px 13px 0;
+      font-family: var(--font); font-size: 14.5px; color: var(--text);
+      background: transparent;
+    }
+    .input-wrap input::placeholder { color: var(--text-light); }
+
+    /* Bouton afficher/masquer le mot de passe */
+    .toggle-pw {
+      padding: 0 12px; background: none; border: none;
+      cursor: pointer; color: var(--text-light);
+      display: flex; align-items: center;
+      transition: color .2s;
+    }
+    .toggle-pw:hover { color: var(--text-mid); }
+    .toggle-pw svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Lien mot de passe oublié */
+    .forgot {
+      display: block; text-align: right; margin-top: 6px;
+      font-size: 13px; color: var(--red); font-weight: 500;
+      text-decoration: none; transition: opacity .2s;
+    }
+    .forgot:hover { opacity: .75; }
+
+    /* Bouton de connexion */
+    .btn-login {
+      width: 100%; margin-top: 8px; padding: 14px;
+      background: var(--red); color: var(--white);
+      border: none; border-radius: var(--radius);
+      font-family: var(--font); font-size: 16px; font-weight: 700;
+      cursor: pointer; transition: background .2s, transform .15s;
+      letter-spacing: .2px;
+    }
+    .btn-login:hover  { background: var(--red-dark); }
+    .btn-login:active { transform: scale(.98); }
+
+    /* Lien créer un compte */
+    .signup-line {
+      text-align: center; margin-top: 22px;
+      font-size: 14px; color: var(--text-mid);
+    }
+    .signup-line a {
+      color: var(--red); font-weight: 600;
+      text-decoration: none; transition: opacity .2s;
+    }
+    .signup-line a:hover { opacity: .75; }
+
+    /* ── MESSAGE D'ERREUR ── */
+    .error-msg {
+      background: var(--red-bg); border: 1px solid rgba(213,43,43,.3);
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 13.5px; color: var(--red); font-weight: 500;
+      margin-bottom: 18px; display: none;
+    }
+    .error-msg.show { display: block; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .card { padding: 32px 22px 28px; border-radius: 12px; }
+      .card-title { font-size: 22px; }
+    }

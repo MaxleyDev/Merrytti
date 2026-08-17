@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique – Merrytti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 24px;
+            margin-top: 30px;
+        }
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        .product-img {
+            height: 200px;
+            background: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .product-img img {
+            max-height: 160px;
+            max-width: 90%;
+            object-fit: contain;
+        }
+        .product-body {
+            padding: 18px;
+        }
+        .product-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .product-price {
+            font-size: 20px;
+            font-weight: 800;
+            color: #c62828;
+            margin-bottom: 8px;
+        }
+        .product-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .btn-acheter {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #c62828;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-acheter:hover {
+            background: #b31e1e;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="index.html" class="logo-wrap">
+            <img src="assets/logo.png" alt="Merrytti Logo" height="40">
+            <span class="brand-color">Merrytti</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="boutique.html" class="active">Boutique</a></li>
+        </ul>
+        <div class="nav-right" id="navAuth">
+            <a href="connexion.html" class="btn btn-outline btn-sm">Connexion</a>
+        </div>
+    </div>
+</nav>
+
+<section style="padding:40px 20px; max-width:1200px; margin:0 auto;">
+    <h1 style="font-size:32px; font-weight:800; margin-bottom:10px;">Notre Boutique</h1>
+    <p style="color:#555; font-size:16px;">Découvrez nos cartes cadeaux de luxe</p>
+    <div class="products-grid" id="productsGrid"></div>
+</section>
+
+<script>
+    async function chargerServices() {
+        try {
+            const rep = await fetch('api/services.php');
+            const services = await rep.json();
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = services.map(s => `
+                <div class="product-card" onclick="location.href='service.html?id=${s.id}'">
+                    <div class="product-img">
+                        <img src="assets/p${s.id}-removebg-preview.png" alt="${s.nom}" onerror="this.src='assets/hero-img.png'">
+                    </div>
+                    <div class="product-body">
+                        <div class="product-name">${s.nom}</div>
+                        <div class="product-price">${s.prix} HTG</div>
+                        <div class="product-description">${s.description || ''}</div>
+                        <a href="reservation.html?service_id=${s.id}" class="btn-acheter" onclick="event.stopPropagation()">Réserver</a>
+                    </div>
+                </div>
+            `).join('');
+        } catch(e) {
+            console.error(e);
+        }
+    }
+    chargerServices();
+</script>
+
+<script>
+    async function mettreAJourNavbar() {
+        try {
+            const rep = await fetch('api/session.php');
+            const data = await rep.json();
+            const navAuth = document.getElementById('navAuth');
+            if (data.connecte) {
+                navAuth.innerHTML = `<a href="profil.html" class="btn btn-outline btn-sm">${data.nom_utilisateur}</a>`;
+            } else {
+                navAuth.innerHTML = `<a href="connexion.html" class="btn btn-outline btn-sm">Connexion</a>`;
+            }
+        } catch(e) {
+            // garder l’affichage par défaut
+        }
+    }
+    mettreAJourNavbar();
+</script>
+</body>
+</html>

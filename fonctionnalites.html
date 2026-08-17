@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fonctionnalités – Merrytti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .page-content { max-width: 800px; margin: 60px auto; padding: 0 20px; }
+        h1 { font-size: 32px; margin-bottom: 20px; }
+        .feature { margin-bottom: 30px; }
+        .feature h2 { font-size: 22px; margin-bottom: 8px; }
+        .feature p { font-size: 16px; color: #444; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-inner">
+            <a href="index.html" class="logo-wrap">
+                <img src="assets/logo.png" alt="Merrytti Logo" height="40">
+                <span class="brand-color">Merrytti</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="boutique.html">Boutique</a></li>
+                <li><a href="fonctionnalites.html" class="active">Fonctionnalités</a></li>
+            </ul>
+            <div class="nav-right" id="navAuth">
+                <a href="connexion.html" class="btn btn-outline btn-sm">Connexion</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-content">
+        <h1>Pourquoi choisir Merrytti ?</h1>
+        <div class="feature">
+            <h2>✨ Expériences haut de gamme</h2>
+            <p>Nous sélectionnons les meilleures expériences : gastronomie, voyage, bien-être, mode.</p>
+        </div>
+        <div class="feature">
+            <h2>🎁 Cartes personnalisables</h2>
+            <p>Chaque carte est unique, avec un code et un QR code. Vous pouvez ajouter un message personnel.</p>
+        </div>
+        <div class="feature">
+            <h2>🔒 Sécurité garantie</h2>
+            <p>Une carte, un usage. Système anti-fraude intégré.</p>
+        </div>
+        <div class="feature">
+            <h2>📊 Portail B2B</h2>
+            <p>Les entreprises peuvent offrir des cadeaux à leurs employés et suivre les dates importantes.</p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">&copy; 2026 Merrytti. Tous droits réservés.</div>
+        </div>
+    </footer>
+
+    <script>
+        async function mettreAJourNavbar() {
+            try {
+                const rep = await fetch('api/session.php');
+                const data = await rep.json();
+                const navAuth = document.getElementById('navAuth');
+                if (data.connecte) {
+                    navAuth.innerHTML = `<a href="profil.html" class="btn btn-outline btn-sm">${data.nom_utilisateur}</a>`;
+                } else {
+                    navAuth.innerHTML = `<a href="connexion.html" class="btn btn-outline btn-sm">Connexion</a>`;
+                }
+            } catch(e) {}
+        }
+        mettreAJourNavbar();
+    </script>
+</body>
+</html>
