@@ -128,3 +128,5 @@ Merci à vous et bon développement ! 🚀
 **MaxleyDev**
 
 💻 Développeur Web Full-Stack & Mobile App
+
+![image alt](https://github.com/MaxleyDev/Merrytti/blob/fb8a626ed11fa95ba26f8ad638bc2f7ef6309485/MERITTI.png.png)
